@@ -1,12 +1,21 @@
 #!/usr/bin/env python
 
 # Custom module
-from lightCommon import *
+import lightCommon as lc
 
-import socket
 import RPi.GPIO as gpio
-from time import sleep
-import struct
+
+import signal,os,socket,struct
+
+def handler(signum, frame):
+    print 'Signal handler called with signal', signum
+    s.close()
+
+# Set the signal handler and a 5-second alarm
+signal.signal(signal.SIGINT, handler)
+
+
+print('Process ID is ' + str(os.getpid()))
 
 # Set up GPIO on the raspberry pi
 gpio.setmode(gpio.BCM)
@@ -18,7 +27,7 @@ lights = {'1':[26,0]}
 
 # Set up every light in the dictionary
 for light in lights:
-    gpio.setup(lights[light][l_pin],gpio.OUT,initial=lights[light][l_stat])
+    gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
 
 print 'GPIO set up'
 
@@ -26,37 +35,37 @@ try:
     # Socket listening on any interface, socket port set in lightCommon
     listenIp = '0.0.0.0'
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((listenIp, socketPort))
+    s.bind((listenIp, lc.socketPort))
     s.listen(1)
 
     # Never end... This is a daemon after all
-    while 1:
+    while s:
         # Accept a connection
         conn, addr = s.accept()    
         print 'Connection accepted from: ', addr
         # Connections to the server immediately send a message
-        recvMsg = conn.recv(struct.calcsize(packString))
+        recvMsg = conn.recv(struct.calcsize(lc.packString))
         try:
             # Unpack the message
-            reqType, lightNum, lightStatus = struct.unpack(packString,recvMsg)
+            reqType, lightNum, lightStatus = struct.unpack(lc.packString,recvMsg)
 
             # For debugging
             print reqType, lightNum, lightStatus
 
             # Query that state of one light
-            if ( reqType == msg_info ):
-                lightStatus = lights[str(lightNum)][l_stat]
-                sendMsg = struct.pack(packString,reqType,lightNum,lightStatus)
+            if ( reqType == lc.msg_info ):
+                lightStatus = lights[str(lightNum)][lc.l_stat]
+                sendMsg = struct.pack(lc.packString,reqType,lightNum,lightStatus)
                 conn.send(sendMsg)
             # Set the state of one light
-            elif ( reqType == msg_set ):
-                gpio.output(lights[str(lightNum)][l_pin],lightStatus)   
-                lights[str(lightNum)][l_stat] = lightStatus
+            elif ( reqType == lc.msg_set ):
+                gpio.output(lights[str(lightNum)][lc.l_pin],lightStatus)   
+                lights[str(lightNum)][lc.l_stat] = lightStatus
             # Query all the lights available
-            elif ( reqType == msg_dump ):
+            elif ( reqType == lc.msg_dump ):
                 for light in lights:
-                    lightStatus = lights[light][l_stat]
-                    sendMsg = struct.pack(packString,reqType,int(light),lightStatus)
+                    lightStatus = lights[light][lc.l_stat]
+                    sendMsg = struct.pack(lc.packString,reqType,int(light),lightStatus)
                     conn.send(sendMsg)
 
         # If a light is requested that doesn't exist
@@ -68,10 +77,12 @@ try:
             print "Error:",e
 
         # Only one message processed at a time. Dump the client
-        conn.send(struct.pack(packString,msg_done,0,0))
+        conn.send(struct.pack(lc.packString,lc.msg_done,0,0))
         conn.close()
 
 except socket.error as e:
     print 'Error:',e
 
 gpio.cleanup()
+
+print('Exiting server')
