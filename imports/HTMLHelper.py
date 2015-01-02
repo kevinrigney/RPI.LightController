@@ -3,7 +3,9 @@ HTMLBreak = '<br>'
 
 def textHeader():
 
-    header = 'Content-Type: text/html\n\n'
+    header = ''
+    header = header + 'Content-Type: text/html\n\n'
+    header = header + '<!DOCTYPE html>'
     header = header + '<html>'
     header = header + '<body>'
     

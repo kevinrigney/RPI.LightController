@@ -1,14 +1,12 @@
+<!DOCTYPE html>
 <html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<head>
+</head>
+
 <body>
-<!--
-<h1>It works!</h1>
-<p>This is the default web page for this server.</p>
-<p>The web server software is running but no content has been added, yet.</p>
-
-
-<button type="button" onclick="var img = new Image(); img.src = 'light/on?light=1'">On</button>
-<button type="button" onclick="var img = new Image(); img.src = 'light/off?light=1'">Off</button>
--->
 
 <form action="lights/onoff" target="statusframe">
 <input type="checkbox" name="1" value="1">Light 1
@@ -32,15 +30,9 @@
 </form> 
 
 <br>
-<iframe name="statusframe" height=100 width=300 src="lights/status" >
+<iframe name="statusframe" height=100 width=300 src="lights/status">
 </iframe>
-
 <br>
-
-<!--
-<iframe name="buttonframe" height=0 width=0 src="light/off" >
-</iframe>
--->
 
 </body>
 </html>
