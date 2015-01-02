@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import socket
+import struct
+from os import environ as env
+
+import lightCommon as lc
+import HTMLHelper as html
+
+
+if '__main__':
+
+    # Print the HTML that says this is just text
+    print(html.textHeader())
+
+    # Query string parser
+    queryArg=html.queryStringParser(env.get('QUERY_STRING'))
+       
+    # TODO Figure out the best way to do this for many hosts
+    HOST = '192.168.42.100'  # The remote host
+
+    # Send msg_req for every item in the query string
+    reqType = lc.msg_set
+    for item in queryArg:
+        lightNum = item[0:item.find('=')]
+        lightStatus = item[item.find('=')+1:]
+        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, lc.port()))
+        s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
+        s.close()
+
+        if ( int(lightStatus) == lc.msg_on ):
+            html.printl('Light ' + lightNum + ' turned on')
+        else:
+            html.printl('Light ' + lightNum + ' turned off')
+
+    print(html.textFooter())

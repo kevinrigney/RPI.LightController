@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+import socket
+import struct
+from os import environ as env
+
+import lightCommon as lc
+import HTMLHelper as html
+
+
+if '__main__':
+
+    # Print the HTML that says this is just text
+    print(html.textHeader())
+
+    for node in lc.nodeList:
+
+        reqType = lc.msg_dump
+        lightNum = 0
+        lightStatus = 0
+
+        try:        
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((node, lc.port()))
+            s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+
+            html.printl('Node ' + node + ':')
+
+            recvMsg = s.recv(struct.calcsize(lc.packString))
+            reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+
+            while reqType is not lc.msg_done:
+
+                if ( int(lightStatus) == lc.msg_on ):
+                    html.printl('Light ' + str(lightNum) + ' is on')
+                else:
+                    html.printl('Light ' + str(lightNum) + ' is off')
+
+                recvMsg = s.recv(struct.calcsize(lc.packString))
+                reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+            
+            s.close()
+
+        except socket.error:
+            html.printl('Error connecting to node ' + node)
+
+    print(html.textFooter())
+

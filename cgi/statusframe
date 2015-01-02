@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import socket
+import struct
+import lightCommon as lc
+#import HTMLWrapper as html
+
+lc.printHTMLHeader()
+
+for node in lc.nodeList:
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((node, lc.port()))
+
+        print('For node ' + node + lc.HTMLBreak)
+
+        reqType = lc.msg_dump
+        lightNum = 0
+        lightStatus = 0
+        
+        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+
+        recvMsg = s.recv(struct.calcsize(lc.packString))
+
+        reqType, lightNum, lightStatus = struct.unpack(lc.packString,recvMsg)
+
+        while (reqType != lc.msg_done):
+
+            if ( lightStatus == lc.msg_on ):
+                print('Light ' + str(lightNum) + ' is on' + lc.HTMLBreak)
+            else:
+                print('Light ' + str(lightNum) + ' is off' + lc.HTMLBreak)
+
+            recvMsg = s.recv(struct.calcsize(lc.packString))
+            reqType, lightNum, lightStatus = struct.unpack(lc.packString,recvMsg)
+
+
+        s.close()
+
+    except socket.error:
+        print( 'Could not connect to ' + node + lc.HTMLBreak )
