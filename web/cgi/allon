@@ -63,6 +63,6 @@ if '__main__':
         except socket.error:
             html.printl('Error connecting to node ' + node)
 
-    html.printl('All lights are on')
+    html.printl('All lights on')
 
     print(html.textFooter())

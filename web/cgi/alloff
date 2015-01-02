@@ -8,7 +8,7 @@ import lightCommon as lc
 import HTMLHelper as html
 
 
-if '__main__':
+if __name__=='__main__':
 
     print(html.textHeader())
 
@@ -44,7 +44,7 @@ if '__main__':
 
 
     if len(lightsOn) > 0:
-        html.printl('Turning on: ')
+        html.printl('Turning off: ')
 
     for light in lightsOn:
         
@@ -65,6 +65,6 @@ if '__main__':
         except socket.error:
             html.printl('Error connecting to node ' + node)
 
-    html.printl('All Lights Off')
+    html.printl('All lights off')
 
     print(html.textFooter())
