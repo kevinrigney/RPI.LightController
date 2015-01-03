@@ -1,6 +1,10 @@
 
 HTMLBreak = '<br>'
 
+cb_name=0
+cb_value=1
+cb_text=2
+
 def textHeader():
 
     header = ''
@@ -30,3 +34,42 @@ def queryStringParser(qString):
         if qString is not '':
             queryArg.append(qString)
     return queryArg
+
+def submitCheckboxBuilder(boxes,action,target):
+    outstr = ''
+    outstr = outstr + '<form action="'
+    outstr = outstr + str(action) + '" target="'
+    outstr = outstr + str(target) + '">'
+
+    for box in boxes:
+        outstr = outstr + '<input type="checkbox" name="'
+        outstr = outstr + str(box[cb_name]) +'" value="'
+        outstr = outstr + str(box[cb_value]) + '">'
+        outstr = outstr + str(box[cb_text])
+
+    outstr = outstr + '</form>'
+
+    return outstr
+
+def singleButtonBuilder(value,action,target):
+
+    outstr = ''
+    outstr = outstr + '<form action="' + str(action) + '" '
+    outstr = outstr + 'target="' + str(target) +'">'
+    outstr = outstr + '<input type="submit" value="'
+    outstr = outstr + str(value) + '"></form>'
+
+    return outstr
+
+def iframeBuilder(name,height,width,source):
+
+    outstr = ''
+    outstr = outstr + '<iframe ' 
+    outstr = outstr + 'name="' + str(name) + '" '
+    outstr = outstr + 'height=' + str(height) + ' '
+    outstr = outstr + 'width=' + str(width) + ' '
+    outstr = outstr + 'src="' + str(source) + '"'
+    outstr = outstr + '></iframe>'
+
+    return outstr
+
