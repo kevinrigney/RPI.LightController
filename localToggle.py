@@ -6,6 +6,8 @@ import lightCommon as lc
 import RPi.GPIO as gpio
 
 import sys,signal,os
+from time import sleep
+
 import socket,struct
 
 def handler(signum, frame):
@@ -17,7 +19,7 @@ signal.signal(signal.SIGINT, handler)
 endIt = False
 
 # The node we are connecting to ( localhost )
-node = 127.0.0.1
+node = '127.0.0.1'
 
 # Set up GPIO on the raspberry pi
 gpio.setmode(gpio.BCM)
@@ -61,7 +63,7 @@ onOrOff = lc.off
 while endIt == False:
 
     # Wait for button press
-    gpio.wait_for_edge(switchPin, gpio.RISING)
+    gpio.wait_for_edge(switchPin, gpio.BOTH)
     for light in localLights:
         try:
 
