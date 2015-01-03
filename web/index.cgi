@@ -23,11 +23,11 @@ for node in lc.nodeList:
         s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
         recvMsg = s.recv(struct.calcsize(lc.packString))
-        reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.packString,recvMsg)
 
         while reqType is not lc.msg_done:
 
-            lights.append((node,lightNum))
+            lights.append((node,lightNum,lightName))
 
             recvMsg = s.recv(struct.calcsize(lc.packString))
             reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
@@ -48,7 +48,7 @@ lightOnCheckboxes = []
 for light in lights:
     name = light[0]
     value = str(light[1]) + ',' + str(int(lc.on))
-    text = str(light[0]) + ' Light ' + str(light[1])
+    text = str(light[0]) + ' Light ' + str(light[2])
     lightOnCheckboxes.append((name,value,text))
 
 
@@ -60,7 +60,7 @@ lightOffCheckboxes = []
 for light in lights:
     name = light[0]
     value = str(light[1]) + ',' + str(int(lc.off))
-    text = str(light[0]) + ' Light ' + str(light[1])
+    text = str(light[0]) + ' Light ' + str(light[2])
     lightOffCheckboxes.append((name,value,text))
 
 html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'lights/onoff','statusframe','Turn Off'))

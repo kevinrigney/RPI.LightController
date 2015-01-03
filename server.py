@@ -20,14 +20,14 @@ print('Process ID is ' + str(os.getpid()))
 # Set up GPIO on the raspberry pi
 gpio.setmode(gpio.BCM)
 
-
 # A dictionary containing info about every light connected to the RPi
-# In the form of: 'lightNum':[pinNum,onOrOffBool]
-lights = {'1':[2,lc.off], '2':[3,lc.off]}
+# In the form of: 'lightNum':[pinNum,onOrOffBool,name]
+lights = {'1':[3,lc.off,'Light 1'], '2':[2,lc.off,'Light 2']}
 
 # Set up every light in the dictionary
 for light in lights:
     gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
+    print('LightNum: '+str(light)+' Pin: '+lights[light][lc.l_pin]+' State: '+lights[light][lc.l_stat]+' Name: '+lights[light][lc.l_name])
 
 print 'GPIO set up'
 
@@ -38,10 +38,10 @@ try:
     s.bind((listenIp, lc.socketPort))
     s.listen(1)
 
-    # Never end... This is a daemon after all
+    # Never end... This is a server after all
     while s:
         # Accept a connection
-        conn, addr = s.accept()    
+        conn, addr = s.accept()
         print 'Connection accepted from: ', addr
         # Connections to the server immediately send a message
         recvMsg = conn.recv(struct.calcsize(lc.packString))
@@ -55,17 +55,21 @@ try:
             # Query that state of one light
             if ( reqType == lc.msg_info ):
                 lightStatus = lights[str(lightNum)][lc.l_stat]
-                sendMsg = struct.pack(lc.packString,reqType,lightNum,lightStatus)
+                lightName = lights[str(lightNum)][lc.l_name]
+                sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                 conn.send(sendMsg)
+
             # Set the state of one light
             elif ( reqType == lc.msg_set ):
                 gpio.output(lights[str(lightNum)][lc.l_pin],lightStatus)   
                 lights[str(lightNum)][lc.l_stat] = lightStatus
+
             # Query all the lights available
             elif ( reqType == lc.msg_dump ):
                 for light in lights:
                     lightStatus = lights[light][lc.l_stat]
-                    sendMsg = struct.pack(lc.packString,reqType,int(light),lightStatus)
+                    lightName = lights[light][lc.l_name]
+                    sendMsg = struct.pack(lc.queryPackString,reqType,int(light),lightStatus,lightName)
                     conn.send(sendMsg)
 
         # If a light is requested that doesn't exist

@@ -27,17 +27,17 @@ if '__main__':
             html.printl('Node ' + node + ':')
 
             recvMsg = s.recv(struct.calcsize(lc.packString))
-            reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.packString,recvMsg)
 
             while reqType is not lc.msg_done:
 
                 if ( int(lightStatus) == lc.msg_on ):
-                    html.printl('Light ' + str(lightNum) + ' is on')
+                    html.printl(lightName + ' is on')
                 else:
-                    html.printl('Light ' + str(lightNum) + ' is off')
+                    html.printl(lightName + ' is off')
 
                 recvMsg = s.recv(struct.calcsize(lc.packString))
-                reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+                reqType,lightNum,lightStatus,lightName = struct.unpack(lc.packString,recvMsg)
             
             s.close()
 
