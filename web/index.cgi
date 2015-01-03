@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import lightCommon as lc
 import HTMLHelper as html
 
