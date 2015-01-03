@@ -4,7 +4,7 @@ l_name=2
 
 # packet is network-endian, msg type, light number, on/off
 packString = '!ii?'
-queryPackString = packString+'10s'
+queryPackString = packString+'30s'
 # Packet info definitions
 msg_info=0
 msg_set=1
@@ -21,7 +21,7 @@ socketPort = 54448
 
 nodeList = [ '192.168.42.100','192.168.42.101' ]
 
-lightList = { '192.168.42.100':{'1':[3,off,'B.1'], '2':[2,off,'B.2']} , '192.168.42.101':{'1':[3,off,'A.1']}  }
+lightList = { '192.168.42.100':{'1':[3,off,'Living Room'], '2':[2,off,'Living Room 2']} , '192.168.42.101':{'1':[3,off,'Bedroom']}  }
 
 
 def port():
