@@ -24,10 +24,8 @@ if '__main__':
             s.connect((node, lc.port()))
             s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-            html.printl('Node ' + node + ':')
-
-            recvMsg = s.recv(struct.calcsize(lc.packString))
-            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.packString,recvMsg)
+            recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
 
             while reqType is not lc.msg_done:
 
@@ -36,8 +34,8 @@ if '__main__':
                 else:
                     html.printl(lightName + ' is off')
 
-                recvMsg = s.recv(struct.calcsize(lc.packString))
-                reqType,lightNum,lightStatus,lightName = struct.unpack(lc.packString,recvMsg)
+                recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+                reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
             
             s.close()
 
