@@ -64,6 +64,14 @@ while endIt == False:
 
     # Wait for button press
     gpio.wait_for_edge(switchPin, gpio.BOTH)
+
+    # Because our input is a pullup tied to ground
+    # a high pin means the switch is open
+    if gpio.input(switchPin) == gpio.HIGH:
+        onOrOff = lc.off
+    else:
+        onOrOff = lc.on
+
     for light in localLights:
         try:
 
@@ -78,10 +86,6 @@ while endIt == False:
 
         except socket.error as e:
             print 'Error:',e
-
-    onOrOff = not onOrOff
-    # Debounce
-    sleep(0.2)
 
 
 gpio.cleanup()
