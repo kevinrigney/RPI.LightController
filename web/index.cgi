@@ -47,7 +47,7 @@ lightOnCheckboxes = []
 
 for light in lights:
     name = light[0]
-    value = str(light[1]) + ',1'
+    value = str(light[1]) + ',' + str(int(lc.on))
     text = str(light[0]) + ' Light ' + str(light[1])
     lightOnCheckboxes.append((name,value,text))
 
@@ -59,7 +59,7 @@ lightOffCheckboxes = []
 
 for light in lights:
     name = light[0]
-    value = str(light[1]) + ',0'
+    value = str(light[1]) + ',' + str(int(lc.off))
     text = str(light[0]) + ' Light ' + str(light[1])
     lightOffCheckboxes.append((name,value,text))
 
