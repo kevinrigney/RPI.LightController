@@ -35,7 +35,7 @@ def queryStringParser(qString):
             queryArg.append(qString)
     return queryArg
 
-def submitCheckboxBuilder(boxes,action,target):
+def submitCheckboxBuilder(boxes,action,target,buttonText):
     outstr = ''
     outstr = outstr + '<form action="'
     outstr = outstr + str(action) + '" target="'
@@ -47,6 +47,8 @@ def submitCheckboxBuilder(boxes,action,target):
         outstr = outstr + str(box[cb_value]) + '">'
         outstr = outstr + str(box[cb_text])
 
+    outstr = outstr + '<input type="submit" value="'
+    outstr = outstr + str(buttonText) + '">'
     outstr = outstr + '</form>'
 
     return outstr

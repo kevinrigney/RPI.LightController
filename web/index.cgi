@@ -52,7 +52,7 @@ for light in lights:
     lightOnCheckboxes.append((name,value,text))
 
 
-html.printl(html.submitCheckboxBuilder(lightOnCheckboxes,'lights/onoff','statusframe'))
+html.printl(html.submitCheckboxBuilder(lightOnCheckboxes,'lights/onoff','statusframe','Turn On'))
 
 # For each light make a checkbox to turn each off
 lightOffCheckboxes = []
@@ -63,7 +63,7 @@ for light in lights:
     text = str(light[0]) + ' Light ' + str(light[1])
     lightOffCheckboxes.append((name,value,text))
 
-html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'lights/onoff','statusframe'))
+html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'lights/onoff','statusframe','Turn Off'))
 
 
 # Make all on
