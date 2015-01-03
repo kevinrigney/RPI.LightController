@@ -52,7 +52,7 @@ for light in lights:
     lightOnCheckboxes.append((name,value,text))
 
 
-html.printl(html.submitCheckboxBuilder(lightOnCheckboxes,'lights/onoff','statusframe','Turn On'))
+html.printl(html.submitCheckboxBuilder(lightOnCheckboxes,'onoff','statusframe','Turn On'))
 
 # For each light make a checkbox to turn each off
 lightOffCheckboxes = []
@@ -63,18 +63,18 @@ for light in lights:
     text = str(light[0]) + ' Light ' + str(light[1])
     lightOffCheckboxes.append((name,value,text))
 
-html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'lights/onoff','statusframe','Turn Off'))
+html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'onoff','statusframe','Turn Off'))
 
 
 # Make all on
-html.printl(html.singleButtonBuilder('Turn On All Lights','lights/allon','statusframe'))
+html.printl(html.singleButtonBuilder('Turn On All Lights','allon','statusframe'))
 
 
 # Make all off
-html.printl(html.singleButtonBuilder('Turn Off All Lights','lights/alloff','statusframe'))
+html.printl(html.singleButtonBuilder('Turn Off All Lights','alloff','statusframe'))
 
 # Make status frame
-html.printl(html.iframeBuilder('statusframe',100,300,'lights/status'))
+html.printl(html.iframeBuilder('statusframe',100,300,'status'))
 
 
 # Write HTML footer
