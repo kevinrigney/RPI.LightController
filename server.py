@@ -27,7 +27,12 @@ lights = {'1':[3,lc.off,'Light 1'], '2':[2,lc.off,'Light 2']}
 # Set up every light in the dictionary
 for light in lights:
     gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
-    print('LightNum: '+str(light)+' Pin: '+lights[light][lc.l_pin]+' State: '+lights[light][lc.l_stat]+' Name: '+lights[light][lc.l_name])
+    statMsg = 'LightNum: ' + str(light) + ' Pin: '
+    statMsg = statMsg + str(lights[light][lc.l_pin]) + ' State: '
+    statMsg = statMsg + str(lights[light][lc.l_stat]) + ' Name: '
+    statMsg = statMsg + str(lights[light][lc.l_name])
+
+    print(statMsg)
 
 print 'GPIO set up'
 
@@ -69,6 +74,7 @@ try:
                 for light in lights:
                     lightStatus = lights[light][lc.l_stat]
                     lightName = lights[light][lc.l_name]
+                    
                     sendMsg = struct.pack(lc.queryPackString,reqType,int(light),lightStatus,lightName)
                     conn.send(sendMsg)
 
@@ -81,12 +87,13 @@ try:
             print "Error:",e
 
         # Only one message processed at a time. Dump the client
-        conn.send(struct.pack(lc.packString,lc.msg_done,0,0))
+        conn.send(struct.pack(lc.queryPackString,lc.msg_done,0,0,''))
         conn.close()
 
 except socket.error as e:
     print 'Error:',e
 
 gpio.cleanup()
+s.close()
 
 print('Exiting server')

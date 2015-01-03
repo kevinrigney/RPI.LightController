@@ -26,16 +26,16 @@ if __name__=='__main__':
             s.connect((node, lc.port()))
             s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-            recvMsg = s.recv(struct.calcsize(lc.packString))
-            reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+            recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
 
             while reqType is not lc.msg_done:
 
                 if ( int(lightStatus) == lc.msg_off ):
-                    lightsOn.append((node,lightNum))
+                    lightsOn.append((node,lightNum,lightName))
                     
-                recvMsg = s.recv(struct.calcsize(lc.packString))
-                reqType,lightNum,lightStatus = struct.unpack(lc.packString,recvMsg)
+                recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+                reqType,lightNum,lightStatus,lightName= struct.unpack(lc.queryPackString,recvMsg)
             
             s.close()
 
@@ -48,6 +48,7 @@ if __name__=='__main__':
     for light in lightsOn:        
         reqType = lc.msg_set
         lightNum = light[1]
+        lightName = light[2]
         lightStatus = lc.msg_on
         node = light[0]
 
@@ -56,7 +57,7 @@ if __name__=='__main__':
             s.connect((node, lc.port()))
             s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-            html.printl('Node ' + node + ', light ' + str(lightNum))
+            html.printl(str(lightName))
 
             s.close()
 

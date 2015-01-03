@@ -4,7 +4,7 @@ l_name=2
 
 # packet is network-endian, msg type, light number, on/off
 packString = '!ii?'
-queryPackString = packString+'s'
+queryPackString = packString+'10s'
 # Packet info definitions
 msg_info=0
 msg_set=1
