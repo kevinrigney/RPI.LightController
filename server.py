@@ -5,7 +5,8 @@ import lightCommon as lc
 
 import RPi.GPIO as gpio
 
-import sys,signal,os,socket,struct
+import sys,signal,os
+import socket,struct
 
 def handler(signum, frame):
     print 'Signal handler called with signal', signum
@@ -14,21 +15,23 @@ def handler(signum, frame):
 # Set the signal handler and a 5-second alarm
 signal.signal(signal.SIGINT, handler)
 
-print('Process ID is ' + str(os.getpid()))
+print('Process ID is: ' + str(os.getpid()))
+
+myIp = sys.argv[1]
+print('My IP is: ' + myIp)
 
 # Set up GPIO on the raspberry pi
 gpio.setmode(gpio.BCM)
 
 # A dictionary containing info about every light connected to the RPi
 # In the form of: 'lightNum':[pinNum,onOrOffBool,name]
-
 lights = []
 try:
-    lights = lc.lightList[str(sys.argv[1])]
+    lights = lc.lightList[myIp]
 except IndexError:
     print('No IP address specified')
 except KeyError:
-    print('No lights found for node ' + str(sys.argv[1]))
+    print('No lights found for node ' + myIp)
 
 # Set up every light in the dictionary
 for light in lights:
