@@ -9,8 +9,11 @@ msg_set=1
 msg_dump=2
 msg_done=3
 
-msg_off=False
-msg_on=True
+off = True
+on = False
+
+msg_off=off
+msg_on=on
 
 socketPort = 54448
 

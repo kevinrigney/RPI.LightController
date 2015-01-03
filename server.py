@@ -23,7 +23,7 @@ gpio.setmode(gpio.BCM)
 
 # A dictionary containing info about every light connected to the RPi
 # In the form of: 'lightNum':[pinNum,onOrOffBool]
-lights = {'1':[26,0]}
+lights = {'1':[2,lc.off], '2':[3,lc.off]}
 
 # Set up every light in the dictionary
 for light in lights:
