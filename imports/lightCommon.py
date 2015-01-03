@@ -21,6 +21,9 @@ socketPort = 54448
 
 nodeList = [ '192.168.42.100' ]
 
+lightList = { '192.168.42.100':{'1':[3,off,'Box1.1'], '2':[2,off,'Box1.2']} }
+
+
 def port():
     return socketPort
 
