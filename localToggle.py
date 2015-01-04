@@ -59,11 +59,15 @@ except socket.error as e:
 
 # We'll use this to set all the lights when the button is pressed
 onOrOff = lc.off
+firstRun = True
 
 while endIt == False:
 
     # Wait for button press
-    gpio.wait_for_edge(switchPin, gpio.BOTH)
+    if firstRun == False:
+        gpio.wait_for_edge(switchPin, gpio.BOTH)
+    else:
+        firstRun = False
 
     # Because our input is a pullup tied to ground
     # a high pin means the switch is open
