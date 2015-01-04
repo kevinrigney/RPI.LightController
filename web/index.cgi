@@ -8,7 +8,6 @@ import socket, struct
 # Enumerate all lights
 lights=[]
 badNode=[]
-htmlOut = ''
 
 # Get lights from every node
 for node in lc.nodeList:
@@ -39,9 +38,9 @@ for node in lc.nodeList:
         badNode.append(node)
 
 # Write HTML header
-
-html.printl(html.textHeader())
-
+print(html.textHeader())
+# Write viewport
+print(html.viewport)
 # For each light make a checkbox to turn each on
 
 lightOnCheckboxes = []
@@ -79,5 +78,5 @@ html.printl(html.iframeBuilder('statusframe',100,300,'lights/status'))
 
 
 # Write HTML footer
-html.printl(html.textFooter())
+print(html.textFooter())
 
