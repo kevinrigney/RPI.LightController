@@ -16,27 +16,36 @@ if '__main__':
     # Query string parser
     queryArg=html.queryStringParser(env.get('QUERY_STRING'))
 
-    #html.printl(str(queryArg))
-      
     # Send msg_req for every item in the query string
     reqType = lc.msg_set
     for item in queryArg:
 
-        node = item.split('=')[0]
-        item = item.split('=')[1]
-        lightNum = item.split('%2C')[0]
-        lightStatus = item.split('%2C')[1]
+        try:
+
+            node = item.split('=')[0]
+            item = item.split('=')[1]
+            lightNum = item.split('%2C')[0]
+            lightStatus = item.split('%2C')[1]
         
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
-        s.close()
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((node, lc.port()))
+            s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
+            s.close()
 
-        lightName = lc.lightList[node][lc.l_name]
+            lightName = lc.lightList[node][lightNum][lc.l_name]
 
-        if ( int(lightStatus) == lc.msg_on ):
-            html.printl(lightName + ' turned on')
-        else:
-            html.printl(lightName + ' turned off')
+            if ( int(lightStatus) == lc.msg_on ):
+                html.printl(str(lightName) + ' turned on')
+            else:
+                html.printl(str(lightName) + ' turned off')
+
+        except socket.error:
+            html.printl('Error connecting to node ' + str(node))
+
+        except KeyError as e:
+            html.printl('Error: ' + str(e))
+
+        except IndexError as e:
+            html.printl('Error: ' + str(e))
 
     print(html.textFooter())
