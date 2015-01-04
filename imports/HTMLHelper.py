@@ -1,6 +1,9 @@
 
 HTMLBreak = '<br>'
 
+# Viewport is used on mobile and from what I can tell right now is static
+viewport = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'
+
 cb_name=0
 cb_value=1
 cb_text=2
