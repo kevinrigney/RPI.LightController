@@ -32,9 +32,11 @@ if '__main__':
         s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
         s.close()
 
+        lightName = lc.lightList[node][lc.l_name]
+
         if ( int(lightStatus) == lc.msg_on ):
-            html.printl('Light ' + lightNum + ' turned on')
+            html.printl(lightName + ' turned on')
         else:
-            html.printl('Light ' + lightNum + ' turned off')
+            html.printl(lightName + ' turned off')
 
     print(html.textFooter())
