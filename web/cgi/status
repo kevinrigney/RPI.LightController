@@ -8,39 +8,37 @@ import lightCommon as lc
 import HTMLHelper as html
 
 
-if '__main__':
+# Print the HTML that says this is just text
+print(html.textHeader())
 
-    # Print the HTML that says this is just text
-    print(html.textHeader())
+for node in lc.nodeList:
 
-    for node in lc.nodeList:
+    reqType = lc.msg_dump
+    lightNum = 0
+    lightStatus = 0
 
-        reqType = lc.msg_dump
-        lightNum = 0
-        lightStatus = 0
+    try:        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((node, lc.port()))
+        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-        try:        
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, lc.port()))
-            s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+        recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
+
+        while reqType is not lc.msg_done:
+
+            if ( int(lightStatus) == lc.msg_on ):
+                html.printl(lightName + ' is on')
+            else:
+                html.printl(lightName + ' is off')
 
             recvMsg = s.recv(struct.calcsize(lc.queryPackString))
             reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
+        
+        s.close()
 
-            while reqType is not lc.msg_done:
+    except socket.error:
+        html.printl('Error connecting to node ' + node)
 
-                if ( int(lightStatus) == lc.msg_on ):
-                    html.printl(lightName + ' is on')
-                else:
-                    html.printl(lightName + ' is off')
-
-                recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-                reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-            
-            s.close()
-
-        except socket.error:
-            html.printl('Error connecting to node ' + node)
-
-    print(html.textFooter())
+print(html.textFooter())
 

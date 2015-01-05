@@ -8,64 +8,62 @@ import lightCommon as lc
 import HTMLHelper as html
 
 
-if __name__=='__main__':
+print(html.textHeader())
 
-    print(html.textHeader())
+lightsOn=[]
 
-    lightsOn=[]
+# Get every node that has lights on
+for node in lc.nodeList:
 
-    # Get every node that has lights on
-    for node in lc.nodeList:
+    reqType = lc.msg_dump
+    lightNum = 0
+    lightStatus = 0
 
-        reqType = lc.msg_dump
-        lightNum = 0
-        lightStatus = 0
+    try:        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((node, lc.port()))
+        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-        try:        
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, lc.port()))
-            s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+        recvMsg = s.recv(struct.calcsize(lc.queryPackString))
+        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
 
+        while reqType is not lc.msg_done:
+
+            if ( int(lightStatus) == lc.msg_on ):
+                lightsOn.append((node,lightNum,lightName))
+                
             recvMsg = s.recv(struct.calcsize(lc.queryPackString))
             reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-
-            while reqType is not lc.msg_done:
-
-                if ( int(lightStatus) == lc.msg_on ):
-                    lightsOn.append((node,lightNum,lightName))
-                    
-                recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-                reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-            
-            s.close()
-
-        except socket.error:
-            html.printl('Error connecting to node ' + node)
-
-
-    if len(lightsOn) > 0:
-        html.printl('Turning off: ')
-
-    for light in lightsOn:
         
-        reqType = lc.msg_set
-        lightNum = light[1]
-        lightName = light[2]
-        lightStatus = lc.msg_off
-        node = light[0]
+        s.close()
 
-        try:        
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, lc.port()))
-            s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+    except socket.error:
+        html.printl('Error connecting to node ' + node)
 
-            html.printl(str(lightName))
 
-            s.close()
+if len(lightsOn) > 0:
+    html.printl('Turning off: ')
 
-        except socket.error:
-            html.printl('Error connecting to node ' + node)
+for light in lightsOn:
+    
+    reqType = lc.msg_set
+    lightNum = light[1]
+    lightName = light[2]
+    lightStatus = lc.msg_off
+    node = light[0]
 
-    html.printl('All lights off')
+    try:        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((node, lc.port()))
+        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
-    print(html.textFooter())
+        html.printl(str(lightName))
+
+        s.close()
+
+    except socket.error:
+        html.printl('Error connecting to node ' + node)
+
+html.printl('All lights off')
+
+print(html.textFooter())

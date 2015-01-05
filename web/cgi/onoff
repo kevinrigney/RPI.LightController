@@ -8,44 +8,42 @@ import lightCommon as lc
 import HTMLHelper as html
 
 
-if '__main__':
+# Print the HTML that says this is just text
+print(html.textHeader())
 
-    # Print the HTML that says this is just text
-    print(html.textHeader())
+# Query string parser
+queryArg=html.queryStringParser(env.get('QUERY_STRING'))
 
-    # Query string parser
-    queryArg=html.queryStringParser(env.get('QUERY_STRING'))
+# Send msg_req for every item in the query string
+reqType = lc.msg_set
+for item in queryArg:
 
-    # Send msg_req for every item in the query string
-    reqType = lc.msg_set
-    for item in queryArg:
+    try:
 
-        try:
+        node = item.split('=')[0]
+        item = item.split('=')[1]
+        lightNum = item.split('%2C')[0]
+        lightStatus = item.split('%2C')[1]
+    
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((node, lc.port()))
+        s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
+        s.close()
 
-            node = item.split('=')[0]
-            item = item.split('=')[1]
-            lightNum = item.split('%2C')[0]
-            lightStatus = item.split('%2C')[1]
-        
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, lc.port()))
-            s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
-            s.close()
+        lightName = lc.lightList[node][lightNum][lc.l_name]
 
-            lightName = lc.lightList[node][lightNum][lc.l_name]
+        if ( int(lightStatus) == lc.msg_on ):
+            html.printl(str(lightName) + ' turned on')
+        else:
+            html.printl(str(lightName) + ' turned off')
 
-            if ( int(lightStatus) == lc.msg_on ):
-                html.printl(str(lightName) + ' turned on')
-            else:
-                html.printl(str(lightName) + ' turned off')
+    except socket.error:
+        html.printl('Error connecting to node ' + str(node))
 
-        except socket.error:
-            html.printl('Error connecting to node ' + str(node))
+    except KeyError as e:
+        html.printl('Error: ' + str(e))
 
-        except KeyError as e:
-            html.printl('Error: ' + str(e))
+    except IndexError as e:
+        html.printl('Error: ' + str(e))
 
-        except IndexError as e:
-            html.printl('Error: ' + str(e))
-
-    print(html.textFooter())
+print(html.textFooter())
