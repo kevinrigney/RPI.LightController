@@ -19,10 +19,9 @@ msg_on=on
 
 socketPort = 54448
 
-nodeList = [ '192.168.42.100','192.168.42.101' ]
+nodeList = [ '192.168.42.100','192.168.42.101','192.168.42.102' ]
 
-lightList = { '192.168.42.100':{'1':[3,off,'Living Room'], '2':[2,off,'Living Room 2']} , '192.168.42.101':{'1':[3,off,'Bedroom']}  }
-
+lightList = { '192.168.42.100':{'1':[3,off,'Living Room'], '2':[2,off,'Living Room 2']} , '192.168.42.101':{'1':[3,off,'Bedroom']},'192.168.42.102':{'1':[3,off,'Office']}  }
 
 def port():
     return socketPort
