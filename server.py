@@ -8,50 +8,20 @@ import RPi.GPIO as gpio
 import sys,signal,os
 import socket,struct
 
+# Global
+lights = []
+
 def handler(signum, frame):
     print 'Signal handler called with signal', signum
     s.close()
 
-# Set the signal handler and a 5-second alarm
-signal.signal(signal.SIGINT, handler)
+def turnOn():
+    pass
 
-print('Process ID is: ' + str(os.getpid()))
+def turnOff():
+    pass
 
-myIp = sys.argv[1]
-print('My IP is: ' + myIp)
-
-# Set up GPIO on the raspberry pi
-gpio.setmode(gpio.BCM)
-
-# A dictionary containing info about every light connected to the RPi
-# In the form of: 'lightNum':[pinNum,onOrOffBool,name]
-lights = []
-try:
-    lights = lc.lightList[myIp]
-except IndexError:
-    print('No IP address specified')
-except KeyError:
-    print('No lights found for node ' + myIp)
-
-# Set up every light in the dictionary
-for light in lights:
-    gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
-    statMsg = 'LightNum: ' + str(light) + ' Pin: '
-    statMsg = statMsg + str(lights[light][lc.l_pin]) + ' State: '
-    statMsg = statMsg + str(lights[light][lc.l_stat]) + ' Name: '
-    statMsg = statMsg + str(lights[light][lc.l_name])
-
-    print(statMsg)
-
-print 'GPIO set up'
-
-try:
-    # Socket listening on any interface, socket port set in lightCommon
-    listenIp = '0.0.0.0'
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((listenIp, lc.socketPort))
-    s.listen(1)
-
+def serverLoop(s):
     # Never end... This is a server after all
     while s:
         # Accept a connection
@@ -99,10 +69,54 @@ try:
         conn.send(struct.pack(lc.queryPackString,lc.msg_done,0,0,''))
         conn.close()
 
-except socket.error as e:
-    print 'Error:',e
+if __name__ == '__main__':
 
-gpio.cleanup()
-s.close()
 
-print('Exiting server')
+    # Set the signal handler
+    signal.signal(signal.SIGINT, handler)
+
+    print('Process ID is: ' + str(os.getpid()))
+
+    myIp = sys.argv[1]
+    print('My IP is: ' + myIp)
+
+    # Set up GPIO on the raspberry pi
+    gpio.setmode(gpio.BCM)
+
+    # A dictionary containing info about every light connected to the RPi
+    # In the form of: 'lightNum':[pinNum,onOrOffBool,name]
+    try:
+        lights = lc.lightList[myIp]
+    except IndexError:
+        print('No IP address specified')
+    except KeyError:
+        print('No lights found for node ' + myIp)
+
+    # Set up every light in the dictionary
+    for light in lights:
+        gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
+        statMsg = 'LightNum: ' + str(light) + ' Pin: '
+        statMsg = statMsg + str(lights[light][lc.l_pin]) + ' State: '
+        statMsg = statMsg + str(lights[light][lc.l_stat]) + ' Name: '
+        statMsg = statMsg + str(lights[light][lc.l_name])
+
+        print(statMsg)
+
+    print 'GPIO set up'
+
+    try:
+        # Socket listening on any interface, socket port set in lightCommon
+        listenIp = '0.0.0.0'
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((listenIp, lc.socketPort))
+        s.listen(1)
+
+        serverLoop(s)
+
+    except socket.error as e:
+        print 'Error:',e
+
+    gpio.cleanup()
+    s.close()
+
+    print('Exiting server')
