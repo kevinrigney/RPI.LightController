@@ -41,9 +41,9 @@ for item in queryArg:
         html.printl('Error connecting to node ' + str(node))
 
     except KeyError as e:
-        html.printl('Error: ' + str(e))
+        html.printl('Key Error: ' + str(e))
 
     except IndexError as e:
-        html.printl('Error: ' + str(e))
+        html.printl('Index Error: ' + str(e))
 
 print(html.textFooter())
