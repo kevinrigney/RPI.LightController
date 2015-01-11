@@ -8,6 +8,9 @@ l_num=0
 l_pin=0
 l_stat=1
 l_name=2
+l_links=3
+link_node=0
+link_num=1
 
 # packet is network-endian, msg type, light number, on/off
 packString = '!ii?'
@@ -28,7 +31,7 @@ msg_on=on
 # All sockets use this port
 socketPort = 54448
 
-nodeList = [ '192.168.42.100','192.168.42.101','192.168.42.102' ]
+nodeList = [ 'b','a','c' ]
 
 nameList = {
         'a':'192.168.42.101',
@@ -37,13 +40,13 @@ nameList = {
         }
 
 lightList = { 
-	'192.168.42.100':
-                [ [3,off,'Living Room'], [2,off,'Living Room 2'] ] , 
-	'192.168.42.101':
-		[ [3,off,'Bedroom'] ],
-	'192.168.42.102':
-		[ [3,off,'Office'], [2,off,'Office 2'] ] 
-	}
+    'b':
+        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2',[] ] ] , 
+    'a':
+        [ [3,off,'Bedroom',[] ] ],
+    'c':
+        [ [3,off,'Office', [['c',1],['b',0]] ], [2,off,'Office 2', [] ] ] 
+    }
 
 def port():
     return socketPort
@@ -71,6 +74,7 @@ def sendSetMsg(node,lNum,lStat):
     success = False
 
     try:
+        node = getIpFromName(node)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((node, port()))
         s.sendall(struct.pack(packString,msg_set,lNum,lStat))
@@ -93,7 +97,7 @@ def enumerateAll():
 
         try:        
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, port()))
+            s.connect((getIpFromName(node), port()))
             s.sendall(struct.pack(packString,reqType,lightNum,lightStatus))
 
             recvMsg = s.recv(struct.calcsize(queryPackString))
@@ -108,6 +112,6 @@ def enumerateAll():
             s.close()
 
         except socket.error:
-            html.printl('Error connecting to node ' + node)
+            pass
 
     return nodes

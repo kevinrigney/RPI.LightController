@@ -8,40 +8,9 @@ import socket, struct
 # Enumerate all lights
 lights=[]
 badNode=[]
-'''
-# Get lights from every node
-for node in lc.nodeList:
-
-    reqType = lc.msg_dump
-    lightNum = 0
-    lightStatus = 0
-
-    try:        
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
-
-        recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-
-        while reqType is not lc.msg_done:
-
-            lights.append((node,lightNum,lightName))
-
-            recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-        
-        s.close()
-
-    except socket.error:
-        badNode.append(node)
-'''
 
 nodeList = lc.enumerateAll()
 for node,props in nodeList:
-
-    # So we don't put IP addresses in the webpage
-    node = lc.getNameFromIp(node)
     lights.append((node,props[lc.l_num],props[lc.l_name]))
 
 # Write HTML header

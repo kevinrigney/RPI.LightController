@@ -19,7 +19,6 @@ for item in queryArg:
 
     try:
         node = item.split('=')[0]
-        node = lc.getIpFromName(node)
         item = item.split('=')[1]
         lightNum = int(item.split('%2C')[0])
         lightStatus = int(item.split('%2C')[1])

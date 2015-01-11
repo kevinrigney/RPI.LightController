@@ -12,47 +12,25 @@ print(html.textHeader())
 
 lightsOn=[]
 
-# Get every node that has lights on
-for node in lc.nodeList:
+allLights = lc.enumerateAll()
 
-    reqType = lc.msg_dump
-    lightNum = 0
-    lightStatus = 0
+for node,props in allLights:
 
-    try:        
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
-
-        recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-
-        while reqType is not lc.msg_done:
-
-            if ( int(lightStatus) == lc.msg_on ):
-                lightsOn.append((node,lightNum,lightName))
-                
-            recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-        
-        s.close()
-
-    except socket.error:
-        html.printl('Error connecting to node ' + node)
-
+    if props[lc.l_stat] == lc.on:
+        lightsOn.append((node,props[lc.l_num],props[lc.l_name]))
 
 if len(lightsOn) > 0:
-    html.printl('Turning off: ')
+    html.printl('Turning on: ')
 
-for light in lightsOn:
+for light in lightsOn:        
     lightNum = light[1]
     lightName = light[2]
     lightStatus = lc.msg_off
     node = light[0]
 
     rc = lc.sendSetMsg(node,lightNum,lightStatus)
-
     html.printl(str(lightName))
+
 
 html.printl('All lights off')
 

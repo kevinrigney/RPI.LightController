@@ -18,10 +18,15 @@ def handler(signum, frame):
 def turnOn(num):
     gpio.output(lights[num][lc.l_pin],lc.on)   
     lights[num][lc.l_stat] = lc.on
+    for link in lights[num][lc.l_links]:
+        lc.sendSetMsg(link[lc.link_node],links[lc.link_num],lc.on)
 
 def turnOff(num):
     gpio.output(lights[num][lc.l_pin],lc.off)   
     lights[num][lc.l_stat] = lc.off
+    for link in lights[num][lc.l_links]:
+        lc.sendSetMsg(link[lc.link_node],links[lc.link_num],lc.off)
+
 
 def setLight(num, status):
     if status == lc.on:
@@ -105,7 +110,7 @@ if __name__ == '__main__':
     # A dictionary containing info about every light connected to the RPi
     # In the form of: 'lightNum':[pinNum,onOrOffBool,name]
     try:
-        lights = lc.lightList[myIp]
+        lights = lc.lightList[lc.getNameFromIp(myIp)]
     except IndexError:
         print('No IP address specified')
     except KeyError:
