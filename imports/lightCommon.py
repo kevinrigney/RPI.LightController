@@ -21,6 +21,12 @@ socketPort = 54448
 
 nodeList = [ '192.168.42.100','192.168.42.101','192.168.42.102' ]
 
+nodeList2 = {
+        'a':'192.168.42.101',
+        'b':'192.168.42.100',
+        'c':'192.168.42.102'
+        }
+
 lightList = { 
 	'192.168.42.100':
                 [ [3,off,'Living Room'], [2,off,'Living Room 2'] ] , 
@@ -28,7 +34,7 @@ lightList = {
 		[ [3,off,'Bedroom'] ],
 	'192.168.42.102':
 		[ [3,off,'Office'], [2,off,'Office 2'] ] 
-	 }
+	}
 
 def port():
     return socketPort
