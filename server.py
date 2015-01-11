@@ -16,14 +16,18 @@ def handler(signum, frame):
     s.close()
 
 def turnOn():
-    pass
+    gpio.output(lights[num][lc.l_pin],lc.on)   
+    lights[num][lc.l_stat] = lc.on
 
 def turnOff():
-    pass
+    gpio.output(lights[num][lc.l_pin],lc.off)   
+    lights[num][lc.l_stat] = lc.off
 
 def setLight(num, status):
-    gpio.output(lights[num][lc.l_pin],status)   
-    lights[num][lc.l_stat] = status
+    if status == lc.on:
+        turnOn(num)
+    else:
+        turnOff(num)
 
 def getStatus(num):
     status = lights[num][lc.l_stat]
@@ -48,8 +52,8 @@ def serverLoop(s):
             # Query that state of one light
             if ( reqType == lc.msg_info ):
                 print 'msg_info'
-                print lightNum
                 lightStatus, lightName = getStatus(lightNum)
+                print lightNum,lightStatus,lightName
                 sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                 conn.send(sendMsg)
 
@@ -68,6 +72,9 @@ def serverLoop(s):
                     print reqType,lightNum, lightStatus, lightName
                     sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                     conn.send(sendMsg)
+
+            else:
+                print('Incorrect request type: %d' % (reqType) )
 
         # If a light is requested that doesn't exist
         except KeyError:
