@@ -15,11 +15,11 @@ def handler(signum, frame):
     print 'Signal handler called with signal', signum
     s.close()
 
-def turnOn():
+def turnOn(num):
     gpio.output(lights[num][lc.l_pin],lc.on)   
     lights[num][lc.l_stat] = lc.on
 
-def turnOff():
+def turnOff(num):
     gpio.output(lights[num][lc.l_pin],lc.off)   
     lights[num][lc.l_stat] = lc.off
 
