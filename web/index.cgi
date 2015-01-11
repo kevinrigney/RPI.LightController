@@ -22,7 +22,6 @@ for node in lc.nodeList:
         s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
 
         recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-        #print recvMsg
         reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
 
         while reqType is not lc.msg_done:
@@ -69,14 +68,13 @@ html.printl(html.submitCheckboxBuilder(lightOffCheckboxes,'lights/onoff','status
 # Make all on
 html.printl(html.singleButtonBuilder('Turn On All Lights','lights/allon','statusframe'))
 
-
 # Make all off
 html.printl(html.singleButtonBuilder('Turn Off All Lights','lights/alloff','statusframe'))
 
 # Make status frame
 html.printl(html.iframeBuilder('statusframe',100,300,'lights/status'))
 
-
 # Write HTML footer
 print(html.textFooter())
+
 

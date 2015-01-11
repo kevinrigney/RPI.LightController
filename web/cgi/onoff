@@ -22,8 +22,8 @@ for item in queryArg:
         node = item.split('=')[0]
         item = item.split('=')[1]
         lightNum = int(item.split('%2C')[0])
-        lightStatus = item.split('%2C')[1]
-    
+        lightStatus = int(item.split('%2C')[1])
+        print node, reqType, lightNum, lightStatus    
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((node, lc.port()))
         s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))

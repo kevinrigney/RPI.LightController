@@ -5,7 +5,7 @@ import lightCommon as lc
 
 import RPi.GPIO as gpio
 
-import sys,signal,os
+import sys,signal,os,time
 import socket,struct
 
 # Global
@@ -35,7 +35,7 @@ def serverLoop(s):
     while s:
         # Accept a connection
         conn, addr = s.accept()
-        print 'Connection accepted from: ', addr
+        print str(time.time()) + ' Connection accepted from: ', addr
         # Connections to the server immediately send a message
         recvMsg = conn.recv(struct.calcsize(lc.packString))
         try:
@@ -43,24 +43,29 @@ def serverLoop(s):
             reqType, lightNum, lightStatus = struct.unpack(lc.packString,recvMsg)
 
             # For debugging
-            print reqType, lightNum, lightStatus
+            print('reqType: %d lightNum: %d lightStatus: %d' % (reqType, lightNum, lightStatus) )
 
             # Query that state of one light
             if ( reqType == lc.msg_info ):
+                print 'msg_info'
+                print lightNum
                 lightStatus, lightName = getStatus(lightNum)
                 sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                 conn.send(sendMsg)
 
             # Set the state of one light
             elif ( reqType == lc.msg_set ):
+                print 'msg_set'
+                print lightNum, lightStatus
                 setLight(lightNum, lightStatus)
                 
             # Query all the lights available
             elif ( reqType == lc.msg_dump ):
+                print 'msg_dump'
                 for light in lights:
                     lightNum = lights.index(light)
-
                     lightStatus, lightName = getStatus(lightNum)                    
+                    print reqType,lightNum, lightStatus, lightName
                     sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                     conn.send(sendMsg)
 
