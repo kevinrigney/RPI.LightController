@@ -16,28 +16,51 @@ def handler(signum, frame):
     s.close()
 
 def turnOn(num):
-    gpio.output(lights[num][lc.l_pin],lc.on)   
-    lights[num][lc.l_stat] = lc.on
-    for link in lights[num][lc.l_links]:
-        lc.sendSetMsg(link[lc.link_node],link[lc.link_num],lc.on)
+    '''
+    This function turns on a locally-connected light based
+    on the light number
+    '''
+    try:
+        gpio.output(lights[num][lc.l_pin],lc.on)   
+        lights[num][lc.l_stat] = lc.on
+
+    except KeyError as e:
+        print 'KeyError in turnOn: ' + str(e)
 
 def turnOff(num):
-    gpio.output(lights[num][lc.l_pin],lc.off)   
-    lights[num][lc.l_stat] = lc.off
-    for link in lights[num][lc.l_links]:
-        lc.sendSetMsg(link[lc.link_node],link[lc.link_num],lc.off)
+    '''
+    This function turns off a locally-connected light based
+    on the light number
+    '''
+    try:
+        gpio.output(lights[num][lc.l_pin],lc.off)   
+        lights[num][lc.l_stat] = lc.off
 
+    except KeyError as e:
+        print 'KeyError in turnOff: ' + str(e)
 
 def setLight(num, status):
+    '''
+    This either calls turnOn or turnOff based on the status requested
+    It also sends messages to all linked lights
+    '''
     if status == lc.on:
         turnOn(num)
     else:
         turnOff(num)
 
+    for link in lights[num][lc.l_links]:
+        lc.sendSetMsg(link[lc.link_node],link[lc.link_num],status)
+
+
 def getStatus(num):
-    status = lights[num][lc.l_stat]
-    name = lights[num][lc.l_name]
-    return status, name
+
+    try:
+        status = lights[num][lc.l_stat]
+        name = lights[num][lc.l_name]
+        return status, name
+    except IndexError as e:
+        print 'IndexError in getStatus: ' + str(e)
 
 def serverLoop(s):
     # Never end... This is a server after all
@@ -94,7 +117,6 @@ def serverLoop(s):
         conn.close()
 
 if __name__ == '__main__':
-
 
     # Set the signal handler
     signal.signal(signal.SIGINT, handler)

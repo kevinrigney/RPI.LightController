@@ -46,7 +46,7 @@ nameList = {
 # This list contains all of the lights, pin definitions, initial state, and links
 lightList = { 
     'b':
-        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2', [['c',2]] ] ] , 
+        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2', [['c',0]] ] ] , 
     'a':
         [ [3,off,'Bedroom',[] ] ],
     'c':
