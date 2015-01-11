@@ -31,21 +31,26 @@ msg_on=on
 # All sockets use this port
 socketPort = 54448
 
-nodeList = [ 'b','a','c' ]
+# This is the list of lights that will show up on the web page.
+# If it's not on this list it can be controlled locally or
+# by linking
+nodeList = [ 'b','a' ]
 
+# Every node should be in this list
 nameList = {
         'a':'192.168.42.101',
         'b':'192.168.42.100',
         'c':'192.168.42.102'
         }
 
+# This list contains all of the lights, pin definitions, initial state, and links
 lightList = { 
     'b':
-        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2',[] ] ] , 
+        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2', [['c',2]] ] ] , 
     'a':
         [ [3,off,'Bedroom',[] ] ],
     'c':
-        [ [3,off,'Office', [['c',1],['b',0]] ], [2,off,'Office 2', [] ] ] 
+        [ [3,off,'Office', [] ], [2,off,'Office 2', [] ] ] 
     }
 
 def port():
