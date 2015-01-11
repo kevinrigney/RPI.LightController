@@ -8,7 +8,7 @@ import socket, struct
 # Enumerate all lights
 lights=[]
 badNode=[]
-
+'''
 # Get lights from every node
 for node in lc.nodeList:
 
@@ -35,6 +35,14 @@ for node in lc.nodeList:
 
     except socket.error:
         badNode.append(node)
+'''
+
+nodeList = lc.enumerateAll()
+for node,props in nodeList:
+
+    # So we don't put IP addresses in the webpage
+    node = lc.getNameFromIp(node)
+    lights.append((node,props[lc.l_num],props[lc.l_name]))
 
 # Write HTML header
 print(html.textHeader())
