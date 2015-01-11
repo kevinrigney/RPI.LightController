@@ -21,6 +21,15 @@ def turnOn():
 def turnOff():
     pass
 
+def setLight(num, status):
+    gpio.output(lights[str(num)][lc.l_pin],status)   
+    lights[str(num)][lc.l_stat] = status
+
+def getStatus(num):
+    status = lights[str(num)][lc.l_stat]
+    name = lights[str(num)][lc.l_name]
+    return status, name
+
 def serverLoop(s):
     # Never end... This is a server after all
     while s:
@@ -38,21 +47,19 @@ def serverLoop(s):
 
             # Query that state of one light
             if ( reqType == lc.msg_info ):
-                lightStatus = lights[str(lightNum)][lc.l_stat]
-                lightName = lights[str(lightNum)][lc.l_name]
+                lightStatus, lightName = getStatus(lightNum)
                 sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                 conn.send(sendMsg)
 
             # Set the state of one light
             elif ( reqType == lc.msg_set ):
-                gpio.output(lights[str(lightNum)][lc.l_pin],lightStatus)   
-                lights[str(lightNum)][lc.l_stat] = lightStatus
-
+                setLight(lightNum, lightStatus)
+                
             # Query all the lights available
             elif ( reqType == lc.msg_dump ):
                 for light in lights:
-                    lightStatus = lights[light][lc.l_stat]
-                    lightName = lights[light][lc.l_name]
+
+                    lightStatus, lightName = getStatus(light)
                     
                     sendMsg = struct.pack(lc.queryPackString,reqType,int(light),lightStatus,lightName)
                     conn.send(sendMsg)
