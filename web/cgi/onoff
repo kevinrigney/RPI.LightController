@@ -19,15 +19,14 @@ reqType = lc.msg_set
 for item in queryArg:
 
     try:
-
         node = item.split('=')[0]
         item = item.split('=')[1]
-        lightNum = item.split('%2C')[0]
+        lightNum = int(item.split('%2C')[0])
         lightStatus = item.split('%2C')[1]
     
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,int(lightNum),int(lightStatus)))
+        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
         s.close()
 
         lightName = lc.lightList[node][lightNum][lc.l_name]
