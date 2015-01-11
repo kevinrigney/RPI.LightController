@@ -53,5 +53,33 @@ def sendSetMsg(node,lNum,lStat):
     # TODO Add actual return code indicating status
     return True
 
+def enumerateAll():
 
+    nodes = []
 
+    for node in nodeList:
+
+        reqType = msg_dump
+        lightNum = 0
+        lightStatus = 0
+
+        try:        
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((node, port()))
+            s.sendall(struct.pack(packString,reqType,lightNum,lightStatus))
+
+            recvMsg = s.recv(struct.calcsize(queryPackString))
+            reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+
+            while reqType is not msg_done:
+                nodes.append((node,[lightNum,lightStatus,lightName])) 
+
+                recvMsg = s.recv(struct.calcsize(queryPackString))
+                reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+            
+            s.close()
+
+        except socket.error:
+            html.printl('Error connecting to node ' + node)
+
+    return nodes

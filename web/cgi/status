@@ -11,34 +11,14 @@ import HTMLHelper as html
 # Print the HTML that says this is just text
 print(html.textHeader())
 
-for node in lc.nodeList:
+nodeList = lc.enumerateAll()
 
-    reqType = lc.msg_dump
-    lightNum = 0
-    lightStatus = 0
+for node,props in nodeList:
 
-    try:        
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
-
-        recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-        reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-
-        while reqType is not lc.msg_done:
-
-            if ( int(lightStatus) == lc.msg_on ):
-                html.printl(lightName + ' is on')
-            else:
-                html.printl(lightName + ' is off')
-
-            recvMsg = s.recv(struct.calcsize(lc.queryPackString))
-            reqType,lightNum,lightStatus,lightName = struct.unpack(lc.queryPackString,recvMsg)
-        
-        s.close()
-
-    except socket.error:
-        html.printl('Error connecting to node ' + node)
+    if ( int(props[lc.l_stat]) == lc.msg_on ):
+        html.printl(props[lc.l_name] + ' is on')
+    else:
+        html.printl(props[lc.l_name] + ' is off')
 
 print(html.textFooter())
 
