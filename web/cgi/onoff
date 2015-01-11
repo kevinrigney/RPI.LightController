@@ -15,7 +15,6 @@ print(html.textHeader())
 queryArg=html.queryStringParser(env.get('QUERY_STRING'))
 
 # Send msg_req for every item in the query string
-reqType = lc.msg_set
 for item in queryArg:
 
     try:
@@ -23,21 +22,15 @@ for item in queryArg:
         item = item.split('=')[1]
         lightNum = int(item.split('%2C')[0])
         lightStatus = int(item.split('%2C')[1])
-        print node, reqType, lightNum, lightStatus    
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
-        s.close()
+
+        rc = lc.sendSetMsg(node,lightNum,lightStatus)
 
         lightName = lc.lightList[node][lightNum][lc.l_name]
 
-        if ( int(lightStatus) == lc.msg_on ):
+        if ( lightStatus == lc.msg_on ):
             html.printl(str(lightName) + ' turned on')
         else:
             html.printl(str(lightName) + ' turned off')
-
-    except socket.error:
-        html.printl('Error connecting to node ' + str(node))
 
     except KeyError as e:
         html.printl('Key Error: ' + str(e))

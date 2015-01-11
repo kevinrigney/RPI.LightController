@@ -45,24 +45,14 @@ if len(lightsOn) > 0:
     html.printl('Turning off: ')
 
 for light in lightsOn:
-    
-    reqType = lc.msg_set
     lightNum = light[1]
     lightName = light[2]
     lightStatus = lc.msg_off
     node = light[0]
 
-    try:        
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((node, lc.port()))
-        s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+    rc = lc.sendSetMsg(node,lightNum,lightStatus)
 
-        html.printl(str(lightName))
-
-        s.close()
-
-    except socket.error:
-        html.printl('Error connecting to node ' + node)
+    html.printl(str(lightName))
 
 html.printl('All lights off')
 

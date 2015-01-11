@@ -1,3 +1,8 @@
+import socket
+import struct
+
+# Definitions
+
 l_pin=0
 l_stat=1
 l_name=2
@@ -38,6 +43,15 @@ lightList = {
 
 def port():
     return socketPort
+
+def sendSetMsg(node,lNum,lStat):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((node, port()))
+    s.sendall(struct.pack(packString,msg_set,lNum,lStat))
+    s.close()
+
+    # TODO Add actual return code indicating status
+    return True
 
 
 
