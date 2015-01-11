@@ -22,12 +22,12 @@ def turnOff():
     pass
 
 def setLight(num, status):
-    gpio.output(lights[str(num)][lc.l_pin],status)   
-    lights[str(num)][lc.l_stat] = status
+    gpio.output(lights[num][lc.l_pin],status)   
+    lights[num][lc.l_stat] = status
 
 def getStatus(num):
-    status = lights[str(num)][lc.l_stat]
-    name = lights[str(num)][lc.l_name]
+    status = lights[num][lc.l_stat]
+    name = lights[num][lc.l_name]
     return status, name
 
 def serverLoop(s):
@@ -58,10 +58,10 @@ def serverLoop(s):
             # Query all the lights available
             elif ( reqType == lc.msg_dump ):
                 for light in lights:
+                    lightNum = lights.index(light)
 
-                    lightStatus, lightName = getStatus(light)
-                    
-                    sendMsg = struct.pack(lc.queryPackString,reqType,int(light),lightStatus,lightName)
+                    lightStatus, lightName = getStatus(lightNum)                    
+                    sendMsg = struct.pack(lc.queryPackString,reqType,lightNum,lightStatus,lightName)
                     conn.send(sendMsg)
 
         # If a light is requested that doesn't exist
@@ -101,11 +101,11 @@ if __name__ == '__main__':
 
     # Set up every light in the dictionary
     for light in lights:
-        gpio.setup(lights[light][lc.l_pin],gpio.OUT,initial=lights[light][lc.l_stat])
+        gpio.setup(light[lc.l_pin],gpio.OUT,initial=light[lc.l_stat])
         statMsg = 'LightNum: ' + str(light) + ' Pin: '
-        statMsg = statMsg + str(lights[light][lc.l_pin]) + ' State: '
-        statMsg = statMsg + str(lights[light][lc.l_stat]) + ' Name: '
-        statMsg = statMsg + str(lights[light][lc.l_name])
+        statMsg = statMsg + str(light[lc.l_pin]) + ' State: '
+        statMsg = statMsg + str(light[lc.l_stat]) + ' Name: '
+        statMsg = statMsg + str(light[lc.l_name])
 
         print(statMsg)
 
