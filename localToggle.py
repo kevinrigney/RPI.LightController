@@ -66,30 +66,42 @@ while endIt == False:
     # Wait for button press
     if firstRun == False:
         gpio.wait_for_edge(switchPin, gpio.BOTH)
+        sleep(0.5)
     else:
         firstRun = False
+        switchStatus = !(gpio.input(switchPin))
 
-    # Because our input is a pullup tied to ground
-    # a high pin means the switch is open
-    if gpio.input(switchPin) == gpio.HIGH:
-        onOrOff = lc.off
-    else:
-        onOrOff = lc.on
 
-    for light in localLights:
-        try:
+    # This is another "debounce" of sorts. Because we are using the raspberry pi
+    # as a current source it may fluctuate at times. This makes sure that if there
+    # is a dip in the supply but the switch hasn't changed that the light doesn't
+    # toggle
 
-            reqType = lc.msg_set
-            lightNum = light
-            lightStatus = onOrOff
+    if gpio.input(switchPin) != switchStatus:
 
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((node, lc.port()))
-            s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
-            s.close
+        # Because our input is a pullup tied to ground
+        # a high pin means the switch is open
+        if gpio.input(switchPin) == gpio.HIGH:
+            onOrOff = lc.off
+        else:
+            onOrOff = lc.on
 
-        except socket.error as e:
-            print 'Error:',e
+        switchStatus = gpio.input(switchPin)
+
+        for light in localLights:
+            try:
+
+                reqType = lc.msg_set
+                lightNum = light
+                lightStatus = onOrOff
+
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((node, lc.port()))
+                s.sendall(struct.pack(lc.packString,reqType,lightNum,lightStatus))
+                s.close
+
+            except socket.error as e:
+                print 'Error:',e
 
 
 gpio.cleanup()
