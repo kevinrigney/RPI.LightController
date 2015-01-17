@@ -66,10 +66,10 @@ while endIt == False:
     # Wait for button press
     if firstRun == False:
         gpio.wait_for_edge(switchPin, gpio.BOTH)
-        sleep(0.5)
+        sleep(0.2)
     else:
         firstRun = False
-        switchStatus = !(gpio.input(switchPin))
+        switchStatus = not gpio.input(switchPin)
 
 
     # This is another "debounce" of sorts. Because we are using the raspberry pi
