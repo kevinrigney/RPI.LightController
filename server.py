@@ -54,7 +54,9 @@ def setLight(num, status):
 
 
 def getStatus(num):
-
+    '''
+    Returns a light number's name and status (on, off)
+    '''
     try:
         status = lights[num][lc.l_stat]
         name = lights[num][lc.l_name]
