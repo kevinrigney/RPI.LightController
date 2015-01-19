@@ -107,6 +107,11 @@ def enumerateAll():
 
             recvMsg = s.recv(struct.calcsize(queryPackString))
             reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+            
+            # Strip trailing '\x00' from socket packing
+            trail_point = lightName.find('\x00')
+            if trail_point >= 1:
+                lightName = lightName[:trail_point]
 
             while reqType is not msg_done:
                 nodes.append((node,[lightNum,lightStatus,lightName])) 
@@ -117,6 +122,7 @@ def enumerateAll():
             s.close()
 
         except socket.error:
+            #print "error connecting to " + str(node)
             pass
 
     return nodes

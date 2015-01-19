@@ -11,9 +11,9 @@ import HTMLHelper as html
 # Print the HTML that says this is just text
 print(html.textHeader())
 
-nodeList = lc.enumerateAll()
+node_list = lc.enumerateAll()
 
-for node,props in nodeList:
+for node,props in node_list:
 
     if ( int(props[lc.l_stat]) == lc.msg_on ):
         html.printl(props[lc.l_name] + ' is on')

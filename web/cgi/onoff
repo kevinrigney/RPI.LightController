@@ -12,25 +12,26 @@ import HTMLHelper as html
 print(html.textHeader())
 
 # Query string parser
-queryArg=html.queryStringParser(env.get('QUERY_STRING'))
+query_arg=html.queryStringParser(env.get('QUERY_STRING'))
 
 # Send msg_req for every item in the query string
-for item in queryArg:
+for item in query_arg:
 
     try:
         node = item.split('=')[0]
         item = item.split('=')[1]
-        lightNum = int(item.split('%2C')[0])
-        lightStatus = int(item.split('%2C')[1])
+        light_num = int(item.split('%2C')[0])
+        light_status = int(item.split('%2C')[1])
 
-        rc = lc.sendSetMsg(node,lightNum,lightStatus)
+        # return code
+        rc = lc.sendSetMsg(node,light_num,light_status)
 
-        lightName = lc.lightList[node][lightNum][lc.l_name]
+        light_name = lc.lightList[node][light_num][lc.l_name]
 
-        if ( lightStatus == lc.msg_on ):
-            html.printl(str(lightName) + ' turned on')
+        if ( light_status == lc.msg_on ):
+            html.printl(str(light_name) + ' turned on')
         else:
-            html.printl(str(lightName) + ' turned off')
+            html.printl(str(light_name) + ' turned off')
 
     except KeyError as e:
         html.printl('Key Error: ' + str(e))

@@ -9,26 +9,26 @@ import HTMLHelper as html
 
 print(html.textHeader())
 
-lightsOn=[]
+lights_off=[]
 
-allLights = lc.enumerateAll()
+all_lights = lc.enumerateAll()
 
-for node,props in allLights:
+for node,props in all_lights:
 
     if props[lc.l_stat] == lc.off:
-        lightsOn.append((node,props[lc.l_num],props[lc.l_name]))
+        lights_off.append((node,props[lc.l_num],props[lc.l_name]))
 
-if len(lightsOn) > 0:
+if len(lights_off) > 0:
     html.printl('Turning on: ')
 
-for light in lightsOn:        
-    lightNum = light[1]
-    lightName = light[2]
-    lightStatus = lc.msg_on
+for light in lights_off:        
+    light_num = light[1]
+    light_name = light[2]
+    light_status = lc.msg_on
     node = light[0]
 
-    rc = lc.sendSetMsg(node,lightNum,lightStatus)
-    html.printl(str(lightName))
+    rc = lc.sendSetMsg(node,light_num,light_status)
+    html.printl(str(light_name))
 
 
 html.printl('All lights on')
