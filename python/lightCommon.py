@@ -34,7 +34,7 @@ socketPort = 54448
 # This is the list of lights that will show up on the web page.
 # If it's not on this list it can be controlled locally or
 # by linking
-nodeList = [ 'b','a' ]
+nodeList = [ 'b','a','c' ]
 
 # Every node should be in this list
 nameList = {
@@ -46,11 +46,11 @@ nameList = {
 # This list contains all of the lights, pin definitions, initial state, and links
 lightList = { 
     'b':
-        [ [3,off,'Living Room',[] ], [2,off,'Living Room 2', [['c',0]] ] ] , 
+        [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] , 
     'a':
         [ [3,off,'Bedroom',[] ] ],
     'c':
-        [ [3,off,'Office', [] ], [2,off,'Office 2', [] ] ] 
+        [ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ] 
     }
 
 def port():

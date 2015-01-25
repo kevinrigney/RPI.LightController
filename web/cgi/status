@@ -18,7 +18,8 @@ for node,props in node_list:
     if ( int(props[lc.l_stat]) == lc.msg_on ):
         html.printl(props[lc.l_name] + ' is on')
     else:
-        html.printl(props[lc.l_name] + ' is off')
+        #html.printl(props[lc.l_name] + ' is off')
+        pass
 
 print(html.textFooter())
 
