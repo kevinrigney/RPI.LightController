@@ -1,5 +1,7 @@
 import socket
 import struct
+import RPi.GPIO as gpio
+
 
 # Definitions
 
@@ -24,6 +26,10 @@ msg_done=3
 # GPIO output values
 off = True
 on = False
+
+# GPIO switch input
+switch_on = gpio.HIGH
+switch_off = gpio.LOW
 
 msg_off=off
 msg_on=on

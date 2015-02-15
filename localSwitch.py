@@ -3,18 +3,20 @@
 # Custom module
 import lightCommon as lc
 
+# Raspberry Pi GPIO
 import RPi.GPIO as gpio
 
-import sys,signal,os
-from time import sleep
 
-import socket,struct
+import sys,signal,os, socket, struct
+from time import sleep
 
 def handler(signum, frame):
     print 'Signal handler called with signal', signum
     end_it = True
 
 # Set the signal handler
+# We could probably just catch a KeyboardInterrupt in the main loop
+# This works fine for the time being
 signal.signal(signal.SIGINT, handler)
 end_it = False
 
@@ -57,31 +59,37 @@ except socket.error as e:
 
 # Now that lights are enumerated wait for button to be pressed
 
-# We'll use this to set all the lights when the button is pressed
+# Set up for main loop
 on_or_off = lc.off
 first_run = True
 
 while end_it == False:
 
+    # This next piece of logic could be better written as a do...while
+    # Oh well. There isn't much of a performance hit because of it. 
+    # This is a simple application after all
+
     # Wait for button press
     if first_run == False:
         gpio.wait_for_edge(switch_pin, gpio.BOTH)
+        # Debounce
         sleep(0.2)
     else:
         first_run = False
+        # set to "not" to force the next piece of logic
         switch_status = not gpio.input(switch_pin)
 
 
     # This is another "debounce" of sorts. Because we are using the raspberry pi
-    # as a current source it may fluctuate at times. This makes sure that if there
-    # is a dip in the supply but the switch hasn't changed that the light doesn't
-    # toggle
+    # as a VERY SMALL current source it may fluctuate at times. This makes sure 
+    # that if there is a dip in the supply but the switch hasn't changed that the 
+    # light doesn't toggle
 
+    # Not equal means it really changed.
     if gpio.input(switch_pin) != switch_status:
 
-        # Because our input is a pullup tied to ground
-        # a high pin means the switch is open
-        if gpio.input(switch_pin) == gpio.HIGH:
+        # lc.switch_off is defined in light common. 
+        if gpio.input(switch_pin) == lc.switch_off:
             on_or_off = lc.off
         else:
             on_or_off = lc.on
