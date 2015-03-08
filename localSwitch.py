@@ -34,7 +34,7 @@ class switchHandler():
         self.switch_pin = switch_pin
         self.switch_type = switch_type  
         self.status = not self.read()
-        self.node = node
+        self.node = lc.getIpFromName(node)
         self.light = light_num
         self.callback()
 
