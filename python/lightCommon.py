@@ -59,6 +59,38 @@ lightList = {
         [ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ] 
     }
 
+# A list of device serial numbers with properties
+nodeProps = {
+    '00000000ee52a78b' : {'node':'b','switches':
+                          [{'switch_pin':19,'switch_type':'momentary','node_name':'b','node_light':1},
+                          {'switch_pin':26,'switch_type':'momentary','node_name':'b','node_light':0}]
+                          },
+    '0000000039ee3670' : {'node':'c'}
+    }
+
+def getNodeProps():
+    '''
+    This function looks up the node properties based on the CPU serial number
+    and the information contained in the switchList
+    '''        
+    try:
+        cpuInfoFile = open('/proc/cpuinfo','r')
+        for line in cpuInfoFile:
+            if line.startswith('Serial'):
+                # The serial is the last item in the line
+                serial = line.rsplit(' ')[-1]
+                # Dump the line break
+                serial = serial.rstrip()
+        cpuInfoFile.close()
+    except:
+        print('Error retrieving serial number')
+    
+    if serial in nodeProps:
+        return nodeProps[serial]
+    else:
+        return {}    
+
+
 def port():
     return socketPort
 

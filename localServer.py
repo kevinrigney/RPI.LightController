@@ -6,8 +6,10 @@ import lightCommon as lc
 # For communicating with GPIO on Raspberry Pi
 import RPi.GPIO as gpio
 
+import socket
+
 import sys,signal,os,time
-import socket,struct
+import struct
 
 # Global
 lights = []
