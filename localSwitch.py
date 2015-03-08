@@ -33,10 +33,10 @@ class switchHandler():
     def __init__(self,switch_pin,switch_type,node,light_num):
         self.switch_pin = switch_pin
         self.switch_type = switch_type  
-        self.status = not read()
+        self.status = not self.read()
         self.node = node
         self.light = light_num
-        callback()
+        self.callback()
 
 # Set the signal handler
 # We could probably just catch a KeyboardInterrupt in the main loop
