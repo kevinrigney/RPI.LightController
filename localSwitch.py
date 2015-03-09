@@ -15,16 +15,40 @@ def handler(signum, frame):
     end_it = True
     
 class switchHandler():    
-    def callback(self):
-        self.status = not self.status
-        req_type = lc.msg_set
-        light_num = self.light
-        light_status = self.status
+    def callback(self,pin):
+
+        print('callback'+str(pin))
+        
+        # This next piece of logic could be better written as a do...while
+        # Oh well. There isn't much of a performance hit because of it. 
+        # This is a simple application after all
     
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.node, lc.port()))
-        s.sendall(struct.pack(lc.packString,req_type,light_num,light_status))
-        s.close()
+        # Debounce
+        sleep(0.2)
+    
+        # This is another "debounce" of sorts. Because we are using the raspberry pi
+        # as a VERY SMALL current source it may fluctuate at times. This makes sure 
+        # that if there is a dip in the supply but the switch hasn't changed that the 
+        # light doesn't toggle
+        
+        #self.status = gpio.input(self.switch_pin)
+
+        if gpio.input(self.switch_pin) == gpio.LOW:
+
+            try:
+                self.status = not self.status
+                print('actually triggering pin '+ str(self.light) + 'status ' + str(self.status))
+                light_num = self.light
+                light_status = self.status
+                req_type = lc.msg_set
+            
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((self.node, lc.port()))
+                s.sendall(struct.pack(lc.packString,req_type,light_num,light_status))
+                s.close()
+
+            except socket.error as e:
+                print 'Error:',e
 
     
     def read(self):        
@@ -36,7 +60,8 @@ class switchHandler():
         self.status = not self.read()
         self.node = lc.getIpFromName(node)
         self.light = light_num
-        self.callback()
+        self.first_run = True
+        self.callback(self.switch_pin)
 
 # Set the signal handler
 # We could probably just catch a KeyboardInterrupt in the main loop
@@ -63,11 +88,9 @@ gpio.setmode(gpio.BCM)
 for switch in switches:    
     gpio.setup(switch['switch_pin'], gpio.IN, pull_up_down=gpio.PUD_UP)
     new_handler = switchHandler(switch['switch_pin'],switch['switch_type'],switch['node_name'],switch['node_light'])
-    gpio.add_event_detect(switch['switch_pin'], GPIO.RISING, callback=new_handler.callback(), bouncetime=300)
+    gpio.add_event_detect(switch['switch_pin'], gpio.FALLING, callback=new_handler.callback, bouncetime=500)
 print 'GPIO set up'
 raw_input()
-
-
 
 
 '''
@@ -103,9 +126,11 @@ except socket.error as e:
 # Set up for main loop
 on_or_off = lc.off
 first_run = True
+switch_pin=26
 
+gpio.setup(switch_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
 
-if switch_type == 'toggle':
+if True:
 
     while end_it == False:
     
@@ -158,10 +183,10 @@ if switch_type == 'toggle':
 else:
     pass
 
-
-gpio.cleanup()
-s.close()
 '''
+gpio.cleanup()
+#s.close()
+
 
 
 print('Exiting localToggle')
