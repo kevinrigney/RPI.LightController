@@ -50,11 +50,20 @@ nameList = {
         }
 
 # This list contains all of the lights, pin definitions, initial state, and links
+
+# List of lists. the list contains each light. Each light is defined as:
+# [pin,initial_state,name,links]
+# where pin is actual raspberry pi pin
+# initial_state is on or off
+# name is what gets used in the webpage
+# and links are lights that are toggled when this light is toggles
+# The layout of links is [node_name,lightNum]
+
 lightList = { 
     'b':
         [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] ] ,
     'a':
-        [ [3,off,'Bedroom',[] ] ],
+        [ [4,off,'Bedroom',[] ] ],
     'c':
         [ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ] 
     }
@@ -63,10 +72,13 @@ lightList = {
 nodeProps = {
     '00000000ee52a78b' : {'node':'b','switches':
                           [{'switch_pin':19,'switch_type':'momentary','node_name':'b','node_light':1},
-                          {'switch_pin':26,'switch_type':'momentary','node_name':'b','node_light':0}]
+                           {'switch_pin':26,'switch_type':'momentary','node_name':'b','node_light':0}]
                           },
-    '0000000039ee3670' : {'node':'c'}
-    }
+    '0000000039ee3670' : {'node':'c'},    
+    '00000000f5d02a25' : {'node':'a','switches':
+                          [{'switch_pin':26,'switch_type':'toggle','node_name':'a','node_light':0}]
+                      },
+             }
 
 def getNodeProps():
     '''
