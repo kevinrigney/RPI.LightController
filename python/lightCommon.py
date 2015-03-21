@@ -23,16 +23,10 @@ msg_set=1
 msg_dump=2
 msg_done=3
 
-# GPIO output values
-off = True
-on = False
+# Globallly accepted values... ALWAYS use these to avoid confusion
+off = False
+on = True
 
-# GPIO switch input
-switch_on = gpio.HIGH
-switch_off = gpio.LOW
-
-msg_off=off
-msg_on=on
 
 # All sockets use this port
 socketPort = 54448
@@ -49,6 +43,34 @@ nameList = {
         'c':'192.168.42.102'
         }
 
+
+# A list of device serial numbers with properties... This is slowly replacing everything else
+nodeProps = {
+    '00000000ee52a78b' : {'node':'b',
+                        'switches':
+                            [{'switch_pin':19,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':1},
+                             {'switch_pin':26,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':0}],
+                        'relays':
+                            [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
+                        'lights':
+                            [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] ]
+                        },
+    '0000000039ee3670' : {'node':'c',
+                        'relays':
+                            [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
+                        'lights':
+                            [ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ]
+                        },    
+    '00000000f5d02a25' : {'node':'a',
+                        'switches':
+                            [{'switch_pin':26,'switch_type':'toggle','switch_active':gpio.HIGH,'node_name':'a','node_light':0}],
+                        'relays':
+                            [{'relay_pin':4,'relay_active':gpio.HIGH}],
+                        'lights':
+                            [ [4,off,'Bedroom',[] ] ]
+                        },
+             }
+
 # This list contains all of the lights, pin definitions, initial state, and links
 
 # List of lists. the list contains each light. Each light is defined as:
@@ -61,27 +83,12 @@ nameList = {
 
 lightList = { 
     'b':
-        [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] ] ,
+        nodeProps['00000000ee52a78b']['lights'] ,
     'a':
-        [ [4,off,'Bedroom',[] ] ],
+        nodeProps['0000000039ee3670']['lights'],
     'c':
-        [ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ] 
+        nodeProps['00000000f5d02a25']['lights'] 
     }
-
-# A list of device serial numbers with properties
-nodeProps = {
-    '00000000ee52a78b' : {'node':'b','switches':
-                          [{'switch_pin':19,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':1},
-                           {'switch_pin':26,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':0}]
-                          },
-    '0000000039ee3670' : {'node':'c'},    
-    '00000000f5d02a25' : {'node':'a','switches':
-                          [{'switch_pin':26,'switch_type':'toggle','switch_active':gpio.HIGH,'node_name':'a','node_light':0}],
-                          'relays':
-                          [{'relay_pin':4,'relay_active':gpio.HIGH}]
-                          
-                      },
-             }
 
 def getNodeProps():
     '''

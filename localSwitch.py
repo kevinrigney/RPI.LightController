@@ -68,7 +68,8 @@ class toggleHandler():
         
         # Because this is a toggle just take the value of the switch and
         # apply it to the light
-        if self.read() == self.switch_active:
+        sleep(0.2)
+        if self.read() == True:
             self.status = lc.on
         else:        
             self.status = lc.off
@@ -88,8 +89,11 @@ class toggleHandler():
             print 'Socket error: ',e           
 
     
-    def read(self):        
-        return gpio.input(self.switch_pin)
+    def read(self):
+        if gpio.input(self.switch_pin) == self.switch_active:        
+            return True
+        else:
+            return False
     
     def __init__(self,switch_dict):
         self.switch_pin = switch_dict['switch_pin']

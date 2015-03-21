@@ -17,14 +17,29 @@ lights = []
 def handler(signum, frame):
     print 'Signal handler called with signal', signum
     s.close()
+    
+def findRelayActive(pin):
+    # All we get here is a pin. This function is called by turnOn or turnOff
+    
+    # No error handling yet.
+    relays = lc.getNodeProps()['relays']
+    for relay in relays:
+        if relay['relay_pin'] == pin:
+            return relay['relay_active']
+        
+      
 
 def turnOn(num):
     '''
     This function turns on a locally-connected light based
-    on the light number
+    on the light number. This SHOULD BE the only place where
+    lc.on/off gets mapped to a T/F write to GPIO
     '''
+    # First look up the relay_active property
+    relay_on = lc.findRelayActive(lights[num][lc.l_pin])
+    
     try:
-        gpio.output(lights[num][lc.l_pin],lc.on)   
+        gpio.output(lights[num][lc.l_pin],relay_on)   
         lights[num][lc.l_stat] = lc.on
 
     except KeyError as e:
@@ -33,10 +48,14 @@ def turnOn(num):
 def turnOff(num):
     '''
     This function turns off a locally-connected light based
-    on the light number
+    on the light number. This SHOULD BE the only place where
+    lc.on/off gets mapped to a T/F write to GPIO
     '''
+    # First look up the relay_active property
+    relay_off = not lc.findRelayActive(lights[num][lc.l_pin])
+        
     try:
-        gpio.output(lights[num][lc.l_pin],lc.off)   
+        gpio.output(lights[num][lc.l_pin],relay_off)   
         lights[num][lc.l_stat] = lc.off
 
     except KeyError as e:
@@ -161,12 +180,12 @@ if __name__ == '__main__':
         listen_ip = '0.0.0.0'
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((listen_ip, lc.socketPort))
-        s.listen(1)
+        s.listen(5)
 
         serverLoop(s)
 
     except socket.error as e:
-        print 'Error:',e
+        print 'Socket error: ',e
 
     gpio.cleanup()
     s.close()
