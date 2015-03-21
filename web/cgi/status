@@ -13,13 +13,18 @@ print(html.textHeader())
 
 node_list = lc.enumerateAll()
 
+printed=False
 for node,props in node_list:
 
     if ( int(props[lc.l_stat]) == lc.on ):
         html.printl(props[lc.l_name] + ' is on')
+        printed=True
     else:
         #html.printl(props[lc.l_name] + ' is off')
         pass
+
+if printed==False
+	html.printl('All lights are off')
 
 print(html.textFooter())
 
