@@ -23,7 +23,7 @@ for node,props in node_list:
         #html.printl(props[lc.l_name] + ' is off')
         pass
 
-if printed==False
+if printed==False:
 	html.printl('All lights are off')
 
 print(html.textFooter())
