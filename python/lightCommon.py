@@ -27,7 +27,6 @@ msg_done=3
 off = False
 on = True
 
-
 # All sockets use this port
 socketPort = 54448
 

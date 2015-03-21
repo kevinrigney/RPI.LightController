@@ -164,8 +164,12 @@ if __name__ == '__main__':
         print('No lights found for node ' + myIp)
 
     # Set up every light in the dictionary
-    for light in lights:       
-        gpio.setup(light[lc.l_pin],gpio.OUT,initial=light[lc.l_stat])
+    for light in lights:
+        initial_state = getRelayActive(light[lc.l_pin])
+        if light[lc.l_stat] == off:
+            initial_state = not initial_state    
+            
+        gpio.setup(light[lc.l_pin],gpio.OUT,initial=initial_state)
         stat_msg = 'LightNum: ' + str(light) + ' Pin: '
         stat_msg = stat_msg + str(light[lc.l_pin]) + ' State: '
         stat_msg = stat_msg + str(light[lc.l_stat]) + ' Name: '
