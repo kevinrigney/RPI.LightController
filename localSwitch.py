@@ -7,17 +7,14 @@ import lightCommon as lc
 import RPi.GPIO as gpio
 
 
-import sys,signal,os, socket, struct
+import sys,os, socket, struct
 from time import sleep
 
-def handler(signum, frame):
-    print 'Signal handler called with signal', signum
-    end_it = True
     
-class switchHandler():    
+class momentaryHandler():    
     def callback(self,pin):
 
-        print('callback'+str(pin))
+        print('Callback called for pin '+str(pin))
         
         # This next piece of logic could be better written as a do...while
         # Oh well. There isn't much of a performance hit because of it. 
@@ -33,11 +30,11 @@ class switchHandler():
         
         #self.status = gpio.input(self.switch_pin)
 
-        if gpio.input(self.switch_pin) == gpio.LOW:
+        if self.read() == gpio.LOW:
 
             try:
                 self.status = not self.status
-                print('actually triggering pin '+ str(self.light) + 'status ' + str(self.status))
+                print('Actually triggering pin '+ str(self.light) + ' status ' + str(self.status))
                 light_num = self.light
                 light_status = self.status
                 req_type = lc.msg_set
@@ -48,7 +45,7 @@ class switchHandler():
                 s.close()
 
             except socket.error as e:
-                print 'Error:',e
+                print 'Socket error: ',e
 
     
     def read(self):        
@@ -62,12 +59,47 @@ class switchHandler():
         self.light = light_num
         self.first_run = True
         self.callback(self.switch_pin)
+        
+        
+class toggleHandler():    
+    def callback(self,pin):
 
-# Set the signal handler
-# We could probably just catch a KeyboardInterrupt in the main loop
-# This works fine for the time being
-signal.signal(signal.SIGINT, handler)
-end_it = False
+        print('Callback called for pin '+str(pin))
+        
+        # Because this is a toggle just take the value of the switch and
+        # apply it to the light
+        if self.read() == gpio.LOW:
+            self.status = lc.off
+        else:        
+            self.status = lc.on
+
+        try:            
+            print('Actually triggering pin '+ str(self.light) + ' status ' + str(self.status))
+            light_num = self.light
+            light_status = self.status
+            req_type = lc.msg_set
+        
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((self.node, lc.port()))
+            s.sendall(struct.pack(lc.packString,req_type,light_num,light_status))
+            s.close()
+
+        except socket.error as e:
+            print 'Socket error: ',e           
+
+    
+    def read(self):        
+        return gpio.input(self.switch_pin)
+    
+    def __init__(self,switch_pin,switch_type,node,light_num):
+        self.switch_pin = switch_pin
+        self.switch_type = switch_type  
+        self.status = self.read()
+        self.node = lc.getIpFromName(node)
+        self.light = light_num
+        self.first_run = True
+        self.callback(self.switch_pin)        
+
 
 # First figure out what node this is so we can make sure this program actually
 # has to run. We'll check for switches
@@ -87,10 +119,22 @@ gpio.setmode(gpio.BCM)
 # Now for every switch set up the GPIO
 for switch in switches:    
     gpio.setup(switch['switch_pin'], gpio.IN, pull_up_down=gpio.PUD_UP)
-    new_handler = switchHandler(switch['switch_pin'],switch['switch_type'],switch['node_name'],switch['node_light'])
-    gpio.add_event_detect(switch['switch_pin'], gpio.FALLING, callback=new_handler.callback, bouncetime=500)
+    
+    if switch['switch_type'] == 'momentary':
+        new_handler = momentaryHandler(switch['switch_pin'],switch['switch_type'],switch['node_name'],switch['node_light'])
+        gpio.add_event_detect(switch['switch_pin'], gpio.FALLING, callback=new_handler.callback, bouncetime=500)
+    
+    elif switch['switch_type'] == 'toggle':
+        new_handler = toggleHandler(switch['switch_pin'],switch['switch_type'],switch['node_name'],switch['node_light'])
+        gpio.add_event_detect(switch['switch_pin'], gpio.BOTH, callback=new_handler.callback, bouncetime=500)
+        
 print 'GPIO set up'
-raw_input()
+
+try:
+    input() # blocks forever
+except KeyboardInterrupt:
+    print('Exiting..')
+    
 
 
 '''
@@ -184,9 +228,7 @@ else:
     pass
 
 '''
+    
 gpio.cleanup()
-#s.close()
-
-
 
 print('Exiting localToggle')
