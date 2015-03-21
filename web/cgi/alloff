@@ -21,7 +21,7 @@ for node,props in all_lights:
         lights_on.append((node,props[lc.l_num],props[lc.l_name]))
 
 if len(lights_on) > 0:
-    html.printl('Turning on: ')
+    html.printl('Turning off: ')
 
 # node is 1, light number is 2, name is 3
 for light in lights_on:        
