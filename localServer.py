@@ -128,8 +128,11 @@ if __name__ == '__main__':
 
     print('Process ID is: ' + str(os.getpid()))
 
-    myIp = sys.argv[1]
-    print('My IP is: ' + myIp)
+    nodeInfo = lc.getNodeProps()
+    try:
+        nodeName = nodeInfo['node']
+    except KeyError:
+        print('This node not found')
 
     # Set up GPIO on the raspberry pi
     gpio.setmode(gpio.BCM)
@@ -137,14 +140,12 @@ if __name__ == '__main__':
     # A dictionary containing info about every light connected to the RPi
     # In the form of: 'lightNum':[pinNum,onOrOffBool,name]
     try:
-        lights = lc.lightList[lc.getNameFromIp(myIp)]
-    except IndexError:
-        print('No IP address specified')
+        lights = lc.lightList[nodeName]
     except KeyError:
         print('No lights found for node ' + myIp)
 
     # Set up every light in the dictionary
-    for light in lights:
+    for light in lights:       
         gpio.setup(light[lc.l_pin],gpio.OUT,initial=light[lc.l_stat])
         stat_msg = 'LightNum: ' + str(light) + ' Pin: '
         stat_msg = stat_msg + str(light[lc.l_pin]) + ' State: '
