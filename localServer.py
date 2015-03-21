@@ -36,7 +36,7 @@ def turnOn(num):
     lc.on/off gets mapped to a T/F write to GPIO
     '''
     # First look up the relay_active property
-    relay_on = lc.findRelayActive(lights[num][lc.l_pin])
+    relay_on = findRelayActive(lights[num][lc.l_pin])
     
     try:
         gpio.output(lights[num][lc.l_pin],relay_on)   
@@ -52,7 +52,7 @@ def turnOff(num):
     lc.on/off gets mapped to a T/F write to GPIO
     '''
     # First look up the relay_active property
-    relay_off = not lc.findRelayActive(lights[num][lc.l_pin])
+    relay_off = not findRelayActive(lights[num][lc.l_pin])
         
     try:
         gpio.output(lights[num][lc.l_pin],relay_off)   
