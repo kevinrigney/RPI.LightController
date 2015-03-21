@@ -85,9 +85,9 @@ lightList = {
     'b':
         nodeProps['00000000ee52a78b']['lights'] ,
     'a':
-        nodeProps['0000000039ee3670']['lights'],
+        nodeProps['00000000f5d02a25']['lights'],
     'c':
-        nodeProps['00000000f5d02a25']['lights'] 
+        nodeProps['0000000039ee3670']['lights'] 
     }
 
 def getNodeProps():
