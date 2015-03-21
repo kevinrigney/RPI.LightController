@@ -28,7 +28,7 @@ for item in query_arg:
 
         light_name = lc.lightList[node][light_num][lc.l_name]
 
-        if ( light_status == lc.msg_on ):
+        if ( light_status == lc.on ):
             html.printl(str(light_name) + ' turned on')
         else:
             html.printl(str(light_name) + ' turned off')
