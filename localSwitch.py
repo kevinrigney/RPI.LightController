@@ -68,10 +68,10 @@ class toggleHandler():
         
         # Because this is a toggle just take the value of the switch and
         # apply it to the light
-        if self.read() == gpio.LOW:
-            self.status = lc.off
-        else:        
+        if self.read() == self.switch_active:
             self.status = lc.on
+        else:        
+            self.status = lc.off
 
         try:            
             print('Actually triggering pin '+ str(self.light) + ' status ' + str(self.status))
@@ -91,13 +91,14 @@ class toggleHandler():
     def read(self):        
         return gpio.input(self.switch_pin)
     
-    def __init__(self,switch_pin,switch_type,node,light_num):
-        self.switch_pin = switch_pin
-        self.switch_type = switch_type  
+    def __init__(self,switch_dict):
+        self.switch_pin = switch_dict['switch_pin']
+        self.switch_type = switch_dict['switch_type']
+        self.switch_active = switch_dict['switch_active']
         self.status = self.read()
-        self.node = lc.getIpFromName(node)
-        self.light = light_num
-        self.first_run = True
+        self.node = lc.getIpFromName(switch_dict['node_name'])
+        self.light = switch_dict['node_light']
+        # Now that the class is set up act on the status of the switch
         self.callback(self.switch_pin)        
 
 
@@ -125,7 +126,7 @@ for switch in switches:
         gpio.add_event_detect(switch['switch_pin'], gpio.FALLING, callback=new_handler.callback, bouncetime=500)
     
     elif switch['switch_type'] == 'toggle':
-        new_handler = toggleHandler(switch['switch_pin'],switch['switch_type'],switch['node_name'],switch['node_light'])
+        new_handler = toggleHandler(switch)
         gpio.add_event_detect(switch['switch_pin'], gpio.BOTH, callback=new_handler.callback, bouncetime=500)
         
 print 'GPIO set up'
