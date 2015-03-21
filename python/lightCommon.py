@@ -71,12 +71,15 @@ lightList = {
 # A list of device serial numbers with properties
 nodeProps = {
     '00000000ee52a78b' : {'node':'b','switches':
-                          [{'switch_pin':19,'switch_type':'momentary','node_name':'b','node_light':1},
-                           {'switch_pin':26,'switch_type':'momentary','node_name':'b','node_light':0}]
+                          [{'switch_pin':19,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':1},
+                           {'switch_pin':26,'switch_type':'momentary','switch_active':gpio.LOW,'node_name':'b','node_light':0}]
                           },
     '0000000039ee3670' : {'node':'c'},    
     '00000000f5d02a25' : {'node':'a','switches':
-                          [{'switch_pin':26,'switch_type':'toggle','node_name':'a','node_light':0}]
+                          [{'switch_pin':26,'switch_type':'toggle','switch_active':gpio.HIGH,'node_name':'a','node_light':0}],
+                          'relays':
+                          [{'relay_pin':4,'relay_active':gpio.HIGH}]
+                          
                       },
              }
 
