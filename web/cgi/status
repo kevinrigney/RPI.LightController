@@ -15,7 +15,7 @@ node_list = lc.enumerateAll()
 
 for node,props in node_list:
 
-    if ( int(props[lc.l_stat]) == lc.msg_on ):
+    if ( int(props[lc.l_stat]) == lc.on ):
         html.printl(props[lc.l_name] + ' is on')
     else:
         #html.printl(props[lc.l_name] + ' is off')

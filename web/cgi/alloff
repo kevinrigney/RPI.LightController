@@ -27,7 +27,7 @@ if len(lights_on) > 0:
 for light in lights_on:        
     light_num = light[1]
     light_name = light[2]
-    light_status = lc.msg_off
+    light_status = lc.off
     node = light[0]
 
     rc = lc.sendSetMsg(node,light_num,light_status)
