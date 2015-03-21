@@ -165,7 +165,7 @@ if __name__ == '__main__':
 
     # Set up every light in the dictionary
     for light in lights:
-        initial_state = getRelayActive(light[lc.l_pin])
+        initial_state = findRelayActive(light[lc.l_pin])
         if light[lc.l_stat] == off:
             initial_state = not initial_state    
             
