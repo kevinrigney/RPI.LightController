@@ -56,12 +56,31 @@ def submitCheckboxBuilder(boxes,action,target,buttonText):
 
     return outstr
 
-def singleButtonBuilder(value,action,target):
+def submitTextboxBuilder(boxes,action,target,buttonText):
+    outstr = ''
+    outstr = outstr + '<form action="'
+    outstr = outstr + str(action) + '" target="'
+    outstr = outstr + str(target) + '">'
+
+    for box in boxes:
+        outstr = outstr + str(box[cb_text]) + '&emsp;'
+        outstr = outstr + '<input type="text" name="'
+        outstr = outstr + str(box[cb_name]) +'" value="'
+        outstr = outstr + str(box[cb_value]) + '"><br>'
+        
+    outstr = outstr + ' <input type="submit" value="'
+    outstr = outstr + str(buttonText) + '">'
+    outstr = outstr + '</form>'
+
+    return outstr
+
+def singleButtonBuilder(value,action,target=''):
 
     outstr = ''
     outstr = outstr + '<form action="' + str(action) + '" '
-    outstr = outstr + 'target="' + str(target) +'">'
-    outstr = outstr + '<input type="submit" value="'
+    if target != '':
+        outstr = outstr + 'target="' + str(target) + '" '
+    outstr = outstr + '><input type="submit" value="'
     outstr = outstr + str(value) + '"></form>'
 
     return outstr

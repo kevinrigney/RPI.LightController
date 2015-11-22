@@ -11,6 +11,8 @@ import socket
 import sys,signal,os,time
 import struct
 
+from threading import Thread
+
 # Global
 lights = []
 
@@ -61,18 +63,26 @@ def turnOff(num):
     except KeyError as e:
         print 'KeyError in turnOff: ' + str(e)
 
-def setLight(num, status):
+def setLight(num, status, tif=0):
     '''
     This either calls turnOn or turnOff based on the status requested
     It also sends messages to all linked lights
     '''
+    
+    # tif is time in future. tif is how long this function will wait before
+    # it actuates the light. This function should probably be threaded if 
+    # tif > 0
+    
+    if tif > 0:
+        time.sleep(tif)      
+        
     if status == lc.on:
         turnOn(num)
     else:
         turnOff(num)
 
     for link in lights[num][lc.l_links]:
-        lc.sendSetMsg(link[lc.link_node],link[lc.link_num],status)
+        lc.sendSetMsg(link[lc.link_node],link[lc.link_num],status,0)
 
 
 def getStatus(num):
@@ -96,10 +106,10 @@ def serverLoop(s):
         recv_msg = conn.recv(struct.calcsize(lc.packString))
         try:
             # Unpack the message
-            req_type, light_num, light_status = struct.unpack(lc.packString,recv_msg)
+            req_type, light_num, light_status, time_in_future = struct.unpack(lc.packString,recv_msg)
 
             # For debugging
-            print('req_type: %d light_num: %d light_status: %d' % (req_type, light_num, light_status) )
+            print('req_type: %d light_num: %d light_status: %d time_in_future = %d' % (req_type, light_num, light_status, time_in_future) )
 
             # Query that state of one light
             if ( req_type == lc.msg_info ):
@@ -112,8 +122,8 @@ def serverLoop(s):
             # Set the state of one light
             elif ( req_type == lc.msg_set ):
                 print 'msg_set'
-                print light_num, light_status
-                setLight(light_num, light_status)
+                print light_num, light_status, time_in_future
+                Thread(target=setLight,args=(light_num, light_status, time_in_future,)).start()
                 
             # Query all the lights available
             elif ( req_type == lc.msg_dump ):

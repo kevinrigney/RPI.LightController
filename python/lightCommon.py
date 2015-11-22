@@ -14,9 +14,9 @@ l_links=3
 link_node=0
 link_num=1
 
-# packet is network-endian, msg type, light number, on/off
-packString = '!ii?'
-queryPackString = packString+'30s'
+# packet is network-endian, msg type, light number, on/off, time in future
+packString = '!ii?i'
+queryPackString = '!ii?'+'30s'
 # Packet info definitions
 msg_info=0
 msg_set=1
@@ -133,7 +133,7 @@ def getNameFromIp(ip):
     return name
         
 
-def sendSetMsg(node,lNum,lStat):
+def sendSetMsg(node,lNum,lStat,tif=0):
 
     success = False
 
@@ -141,7 +141,7 @@ def sendSetMsg(node,lNum,lStat):
         node = getIpFromName(node)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((node, port()))
-        s.sendall(struct.pack(packString,msg_set,lNum,lStat))
+        s.sendall(struct.pack(packString,msg_set,lNum,lStat,tif))
         s.close()
         success = True
     except socket.error:
@@ -158,11 +158,12 @@ def enumerateAll():
         reqType = msg_dump
         lightNum = 0
         lightStatus = 0
+        tif = 0
 
         try:        
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((getIpFromName(node), port()))
-            s.sendall(struct.pack(packString,reqType,lightNum,lightStatus))
+            s.sendall(struct.pack(packString,reqType,lightNum,lightStatus,tif))
 
             recvMsg = s.recv(struct.calcsize(queryPackString))
             reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)

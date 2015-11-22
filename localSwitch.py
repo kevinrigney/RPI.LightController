@@ -41,7 +41,7 @@ class momentaryHandler():
             
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((self.node, lc.port()))
-                s.sendall(struct.pack(lc.packString,req_type,light_num,light_status))
+                s.sendall(struct.pack(lc.packString,req_type,light_num,light_status,0))
                 s.close()
 
             except socket.error as e:
@@ -82,7 +82,7 @@ class toggleHandler():
         
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((self.node, lc.port()))
-            s.sendall(struct.pack(lc.packString,req_type,light_num,light_status))
+            s.sendall(struct.pack(lc.packString,req_type,light_num,light_status,0))
             s.close()
 
         except socket.error as e:

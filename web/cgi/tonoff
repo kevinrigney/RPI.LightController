@@ -24,16 +24,17 @@ for item in query_arg:
         item = item.split('=')[1]
         light_num = int(item.split('%2C')[0])
         light_status = int(item.split('%2C')[1])
+        light_time = int(item.split('%2C')[2])
 
         # return code
-        rc = lc.sendSetMsg(node,light_num,light_status)
+        rc = lc.sendSetMsg(node,light_num,light_status,light_time)
 
         light_name = lc.lightList[node][light_num][lc.l_name]
 
         if ( light_status == lc.on ):
-            html.printl(str(light_name) + ' turned on')
+            html.printl(str(light_name) + ' will turn on ' + str(light_time) + ' seconds in the future')
         else:
-            html.printl(str(light_name) + ' turned off')
+            html.printl(str(light_name) + ' will turn off ' + str(light_time) + ' seconds in the future')
 
     except KeyError as e:
         html.printl('Key Error: ' + str(e))

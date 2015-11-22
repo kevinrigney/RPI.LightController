@@ -62,6 +62,9 @@ html.printl(html.singleButtonBuilder('Turn Off All Lights','lights/alloff','stat
 # Make status frame
 html.printl(html.iframeBuilder('statusframe',100,300,'lights/status'))
 
+# Timed
+html.printl(html.singleButtonBuilder('Set Timer','./timed.cgi'))
+
 # Write HTML footer
 print(html.textFooter())
 
