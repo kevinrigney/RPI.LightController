@@ -1,8 +1,14 @@
 import socket
 import struct
-import RPi.GPIO as gpio
-
-
+import warnings
+try:
+    import RPi.GPIO as gpio
+except ImportError as e:
+    warnings.warn('Are you running on a rasbperry pi?')
+    class gpio:
+        LOW = 0
+        HIGH = 1
+        pass
 # Definitions
 
 # list locations
@@ -35,15 +41,37 @@ socketPort = 54448
 # by linking
 nodeList = [ 'b','a','c' ]
 
-# Every node should be in this list
+# Every node should be in this list - it's used to map
+# node names to IP addresses and vice versa
 nameList = {
         'a':'192.168.42.101',
         'b':'192.168.42.100',
         'c':'192.168.42.102'
         }
 
+'''
+Here's the all-encompasing nodeProps dictionary. This dictionary lets the raspberry pi know what's actually 
+connected to itself, and lets all other pi's know what is connected to each other.
 
-# A list of device serial numbers with properties... This is slowly replacing everything else
+The initial dictionary entry is the serial number of the raspberry pi. Here's the details of the contents
+of the rest of the dictionary:
+    Node - The common name for the node - used in the CGI, switches['node_name'], and the lights list
+    switches - a list of dictionaries that describe the switches connected to the raspberry pi
+        switch_pin - the GPIO pin the switch is connected to
+        switch_type - 'momentary' or 'toggle', the localSwitch program handles the cases differently
+        switch_active - the GPIO state the switch the pin has to be in for localSwitch to activate
+        node_name - the node that the switch controls
+        node_light - the light on the node that the switch controls
+    relays - A list of dictionaries that describe all connected relays (that control an actual outlet)
+        relay_pin - the GPIO pin the relay is connected to
+        relay_active - the GPIO status that turns the relay on
+    lights - A list of lists that describe the lights that this node controls
+        [0] - the "light number" (see switches['node_light'])
+        [1] - the default state - on or off
+        [2] - a list of lists describing any linked lights - must be [] at minimum
+            [0] - the node name of the node that controls the linked light
+            [1] - the light number on the node of the light you want to change
+'''
 nodeProps = {
     '00000000ee52a78b' : {'node':'b',
                         'switches':
@@ -62,7 +90,7 @@ nodeProps = {
                         },    
     '00000000f5d02a25' : {'node':'a',
                         'switches':
-                            [{'switch_pin':26,'switch_type':'toggle','switch_active':gpio.HIGH,'node_name':'a','node_light':0}],
+                            [{'switch_pin':26,'switch_type':'toggle','switch_active':gpio.HIGH,'node_name':'localhost','node_light':0}],
                         'relays':
                             [{'relay_pin':4,'relay_active':gpio.HIGH}],
                         'lights':
@@ -70,16 +98,20 @@ nodeProps = {
                         },
              }
 
-# This list contains all of the lights, pin definitions, initial state, and links
 
-# List of lists. the list contains each light. Each light is defined as:
-# [pin,initial_state,name,links]
-# where pin is actual raspberry pi pin
-# initial_state is on or off
-# name is what gets used in the webpage
-# and links are lights that are toggled when this light is toggles
-# The layout of links is [node_name,lightNum]
 
+'''
+THE LIGHTLIST HAS BEEN SUPERCEDED BY nodeProps.
+THE LIGHTLIST IS DEPRECATED
+
+List of lists. the list contains each light. Each light is defined as:
+[pin,initial_state,name,links]
+where pin is actual raspberry pi pin
+initial_state is on or off
+name is what gets used in the webpage
+and links are lights that are toggled when this light is toggles
+The layout of links is [node_name,lightNum]
+'''
 lightList = { 
     'b':
         nodeProps['00000000ee52a78b']['lights'] ,
@@ -116,12 +148,27 @@ def port():
     return socketPort
 
 def getIpFromName(name):
-
-    # TODO Add try/except key error
-
-    return nameList[str(name)]
+    '''
+    Look up the IP address of a common name (nameList)
+    or maybe of a dns entry
+    '''
+    ip = ''
+    
+    try:
+        ip = nameList[str(name)]
+    except KeyError as e:
+        pass
+    
+    if ip == '':
+        ip = socket.gethostbyname(name)   
+            
+    return ip
 
 def getNameFromIp(ip):
+    '''
+    use the nameList to turn a name
+    into an IP address to open a socket to
+    '''
 
     name = ''
 
@@ -134,6 +181,11 @@ def getNameFromIp(ip):
         
 
 def sendSetMsg(node,lNum,lStat,tif=0):
+    '''
+    Send a message to a listening localServer
+    to set a light to a specific state at some
+    time in the future
+    '''
 
     success = False
 
@@ -150,6 +202,10 @@ def sendSetMsg(node,lNum,lStat,tif=0):
     return success
 
 def enumerateAll():
+    '''
+    This function asks every node for its connected lights
+    and their respective status.
+    '''
 
     nodes = []
 
