@@ -80,13 +80,17 @@ nodeProps = {
                         'relays':
                             [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
                         'lights':
-                            [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] ]
+                            # For Christmas Only
+                            [ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',1] ] ] ]
+                            #[ [3,off,'LR Door',[] ], [2,off,'LR All', [ ['b',0],['c',0],['c',1] ] ] ]
                         },
     '0000000039ee3670' : {'node':'c',
                         'relays':
                             [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
                         'lights':
+                            # For Christmas Only
                             [ [3,off,'Christmas Lights', [] ], [2,off,'LR Wall', [] ] ]
+                            #[ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ]
                         },    
     '00000000f5d02a25' : {'node':'a',
                         'switches':
