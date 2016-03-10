@@ -145,6 +145,7 @@ def getNodeProps():
     if serial in nodeProps:
         return nodeProps[serial]
     else:
+        print('Could not look up node properties. Serial is: ' + serial)
         return {}    
 
 
