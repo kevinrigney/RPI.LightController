@@ -105,9 +105,7 @@ nodeProps = {
                         'relays':
                             [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
                         'lights':
-                            # For Christmas Only
-                            [ [3,off,'D-Top', [] ], [2,off,'D-Bottom', [] ] ]
-                            #[ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ]
+                            [ [3,off,'D-Bottom', [] ], [2,off,'D-Top', [] ] ]
                         },    
 
              }
