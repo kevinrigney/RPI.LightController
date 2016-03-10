@@ -39,14 +39,15 @@ socketPort = 54448
 # This is the list of lights that will show up on the web page.
 # If it's not on this list it can be controlled locally or
 # by linking
-nodeList = [ 'b','a','c' ]
+nodeList = [ 'b','a','c','d' ]
 
 # Every node should be in this list - it's used to map
 # node names to IP addresses and vice versa
 nameList = {
         'a':'192.168.42.101',
         'b':'192.168.42.100',
-        'c':'192.168.42.102'
+        'c':'192.168.42.102',
+        'd':'192.168.42.103',
         }
 
 '''
@@ -100,6 +101,15 @@ nodeProps = {
                         'lights':
                             [ [4,off,'Bedroom',[] ] ]
                         },
+    '00000000fc2516db' : {'node':'d',
+                        'relays':
+                            [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
+                        'lights':
+                            # For Christmas Only
+                            [ [3,off,'D-Top', [] ], [2,off,'D-Bottom', [] ] ]
+                            #[ [3,off,'LR Couch', [] ], [2,off,'LR TV', [] ] ]
+                        },    
+
              }
 
 
@@ -122,7 +132,9 @@ lightList = {
     'a':
         nodeProps['00000000f5d02a25']['lights'],
     'c':
-        nodeProps['0000000039ee3670']['lights'] 
+        nodeProps['0000000039ee3670']['lights'], 
+    'd':
+        nodeProps['00000000fc2516db']['lights'],
     }
 
 def getNodeProps():
