@@ -40,7 +40,7 @@ for light in lights:
     l_on_checkboxes.append((name,value,text))
 
 
-html.printl(html.submitCheckboxBuilder(l_on_checkboxes,'lights/onoff','statusframe','Turn On'))
+html.printl(html.submitCheckboxBuilder(l_on_checkboxes,'cgi/onoff','statusframe','Turn On'))
 
 # For each light make a checkbox to turn each off
 l_off_checkboxes = []
@@ -51,16 +51,16 @@ for light in lights:
     text = str(light[2])
     l_off_checkboxes.append((name,value,text))
 
-html.printl(html.submitCheckboxBuilder(l_off_checkboxes,'lights/onoff','statusframe','Turn Off'))
+html.printl(html.submitCheckboxBuilder(l_off_checkboxes,'cgi/onoff','statusframe','Turn Off'))
 
 # Make all on
-html.printl(html.singleButtonBuilder('Turn On All Lights','lights/allon','statusframe'))
+html.printl(html.singleButtonBuilder('Turn On All Lights','cgi/allon','statusframe'))
 
 # Make all off
-html.printl(html.singleButtonBuilder('Turn Off All Lights','lights/alloff','statusframe'))
+html.printl(html.singleButtonBuilder('Turn Off All Lights','cgi/alloff','statusframe'))
 
 # Make status frame
-html.printl(html.iframeBuilder('statusframe',100,300,'lights/status'))
+html.printl(html.iframeBuilder('statusframe',100,300,'cgi/status'))
 
 # Timed
 html.printl(html.singleButtonBuilder('Set Timer','./timed.cgi'))
