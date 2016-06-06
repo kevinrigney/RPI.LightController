@@ -141,14 +141,13 @@ def getNodeProps():
     and the information contained in the switchList
     '''        
     try:
-        cpuInfoFile = open('/proc/cpuinfo','r')
-        for line in cpuInfoFile:
-            if line.startswith('Serial'):
-                # The serial is the last item in the line
-                serial = line.rsplit(' ')[-1]
-                # Dump the line break
-                serial = serial.rstrip()
-        cpuInfoFile.close()
+        with open('/proc/cpuinfo','r') as cpuInfoFile:
+            for line in cpuInfoFile:
+                if line.startswith('Serial'):
+                    # The serial is the last item in the line
+                    serial = line.rsplit(' ')[-1]
+                    # Dump the line break
+                    serial = serial.rstrip()
     except:
         print('Error retrieving serial number')
     
