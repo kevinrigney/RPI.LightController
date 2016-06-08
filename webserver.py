@@ -1,3 +1,4 @@
+#/usr/bin/env python2
 """CGI-savvy HTTP Server.
 
 This module builds on SimpleHTTPServer by implementing GET and POST
@@ -30,6 +31,7 @@ import BaseHTTPServer
 import SimpleHTTPServer
 import select
 import copy
+import ssl
 
 
 class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -43,7 +45,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
 
     # Determine platform specifics
-    have_fork = hasattr(os, 'fork')
+    have_fork = False #hasattr(os, 'fork') # False # 
     have_popen2 = hasattr(os, 'popen2')
     have_popen3 = hasattr(os, 'popen3')
 
@@ -130,10 +132,10 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         else:
             script, rest = rest, ''
 
-        scriptname = dir + '/' + script
+        scriptname = dir + 'web/' + script
 
-        if scriptname == '//':
-            scriptname='/index.cgi'
+        if scriptname == '/web/':
+            scriptname='/web/index.cgi'
 
         scriptfile = self.translate_path(scriptname)
         if not os.path.exists(scriptfile):
@@ -375,8 +377,16 @@ def executable(path):
 
 def test(HandlerClass = CGIHTTPRequestHandler,
          ServerClass = BaseHTTPServer.HTTPServer):
+
     SimpleHTTPServer.test(HandlerClass, ServerClass)
 
 
 if __name__ == '__main__':
-    test()
+    #test()
+    HandlerClass = CGIHTTPRequestHandler
+    httpd = BaseHTTPServer.HTTPServer(('',443),HandlerClass)
+    httpd.socket = ssl.wrap_socket (httpd.socket, certfile='/etc/letsencrypt/live/kevin-rigney.com/fullchain.pem', keyfile='/etc/letsencrypt/live/kevin-rigney.com/privkey.pem' ,server_side=True, ssl_version=ssl.PROTOCOL_TLSv1_2) 
+    print('serve_forever...')
+    httpd.serve_forever()
+    
+    
