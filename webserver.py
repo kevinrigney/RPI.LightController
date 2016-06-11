@@ -1,4 +1,4 @@
-#/usr/bin/env python2
+#!/usr/bin/env python2
 """CGI-savvy HTTP Server.
 
 This module builds on SimpleHTTPServer by implementing GET and POST
@@ -32,7 +32,10 @@ import SimpleHTTPServer
 import select
 import copy
 import ssl
-
+import subprocess
+import base64, binascii
+import time
+from userauth import try_authenticate as try_auth
 
 class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
@@ -46,6 +49,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     # Determine platform specifics
     have_fork = False #hasattr(os, 'fork') # False # 
+    #have_fork = hasattr(os, 'fork')
     have_popen2 = hasattr(os, 'popen2')
     have_popen3 = hasattr(os, 'popen3')
 
@@ -59,11 +63,10 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         This is only implemented for CGI scripts.
 
         """
-
         if self.is_cgi():
             self.run_cgi()
         else:
-            self.send_error(501, "Can only POST to CGI scripts")
+            self.send_error(501, "Error 501")#"Can only POST to CGI scripts")
 
     def send_head(self):
         """Version of send_head that support CGI scripts"""
@@ -132,28 +135,25 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         else:
             script, rest = rest, ''
 
-        scriptname = dir + 'web/' + script
+        scriptname = 'web'+dir + '/' + script
 
-        if scriptname == '/web/':
-            scriptname='/web/index.cgi'
+        if scriptname == 'web//':
+            scriptname='web/index.cgi'
 
         scriptfile = self.translate_path(scriptname)
         if not os.path.exists(scriptfile):
-            self.send_error(404, "No such CGI script (%r)" % scriptname)
+            self.send_error(404, "Error 403")#"No such CGI script (%r)" % scriptname)
             return
         if not os.path.isfile(scriptfile):
-            self.send_error(403, "CGI script is not a plain file (%r)" %
-                            scriptname)
+            self.send_error(403, "Error 403")#"CGI script is not a plain file (%r)" % scriptname)
             return
         ispy = self.is_python(scriptname)
         if not ispy:
             if not (self.have_fork or self.have_popen2 or self.have_popen3):
-                self.send_error(403, "CGI script is not a Python script (%r)" %
-                                scriptname)
+                self.send_error(403, "Error 403")#"CGI script is not a Python script (%r)" % scriptname)
                 return
             if not self.is_executable(scriptfile):
-                self.send_error(403, "CGI script is not executable (%r)" %
-                                scriptname)
+                self.send_error(403, "Error 403")#"CGI script is not executable (%r)" % scriptname)
                 return
 
         # Reference: http://hoohoo.ncsa.uiuc.edu/cgi/env.html
@@ -179,7 +179,6 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if authorization:
             authorization = authorization.split()
             if len(authorization) == 2:
-                import base64, binascii
                 env['AUTH_TYPE'] = authorization[0]
                 if authorization[0].lower() == "basic":
                     try:
@@ -258,7 +257,6 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         else:
             # Non Unix - use subprocess
-            import subprocess
             cmdline = [scriptfile]
             if self.is_python(scriptfile):
                 interp = sys.executable
@@ -274,6 +272,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 nbytes = int(length)
             except (TypeError, ValueError):
                 nbytes = 0
+
             p = subprocess.Popen(cmdline,
                                  stdin = subprocess.PIPE,
                                  stdout = subprocess.PIPE,
@@ -299,6 +298,66 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 self.log_error("CGI script exit status %#x", status)
             else:
                 self.log_message("CGI script exited OK")
+
+class AuthHandler(CGIHTTPRequestHandler):
+    ''' Main class to present webpages and authentication. '''
+
+    def log_message(self, format, *args):
+        """Log an arbitrary message.
+        Overloaded from the regular log_message to change
+        the format to date first then IP address
+        """
+
+        #sys.stderr.write("%s - - [%s] %s\n" %
+        sys.stdout.write("[%s] %s - %s\n" %
+                         (self.log_date_time_string(),
+                          self.client_address[0],
+                          format%args))
+        with open('/var/log/pythonHTTPSServer.log','a') as fh:
+            fh.write("[%s] %s - %s\n" %
+                         (self.log_date_time_string().replace('/','-'),
+                          self.client_address[0],
+                          format%args))
+    
+
+
+    def log_access(self,success,username='None'):
+        if success:
+            success='PASS'
+        else:
+            success='FAIL'
+        if type(username) != str:
+            username = 'None'
+        self.log_message('ACCESS: Username: ' + username + ' Status: '+success)
+
+    def do_HEAD(self):
+        #print "send header"
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+    def do_AUTHHEAD(self):
+        # Sleep to help to prevent bruteforcing
+        #time.sleep(3)
+        #print "send header"
+        self.send_response(401)
+        #self.send_header('WWW-Authenticate', 'Digest realm=\"lights@kevin-rigney.com\"')
+        self.send_header('WWW-Authenticate', 'Basic realm="kevin-rigney.com"')
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+    def do_GET(self):
+        ''' Present frontpage with user authentication. '''
+        (ok,user) = try_auth(self.headers.getheader('Authorization'))
+        self.log_access(ok,user)
+        if ok:
+            self.do_POST()
+            pass
+        else:
+            self.do_AUTHHEAD()
+            #self.wfile.write(self.headers.getheader('Authorization'))
+            self.wfile.write('Invalid username/password combination.')
+            pass
 
 
 def _url_collapse_path(path):
@@ -383,7 +442,8 @@ def test(HandlerClass = CGIHTTPRequestHandler,
 
 if __name__ == '__main__':
     #test()
-    HandlerClass = CGIHTTPRequestHandler
+    HandlerClass = AuthHandler
+    #HandlerClass = CGIHTTPRequestHandler
     httpd = BaseHTTPServer.HTTPServer(('',443),HandlerClass)
     httpd.socket = ssl.wrap_socket (httpd.socket, certfile='/etc/letsencrypt/live/kevin-rigney.com/fullchain.pem', keyfile='/etc/letsencrypt/live/kevin-rigney.com/privkey.pem' ,server_side=True, ssl_version=ssl.PROTOCOL_TLSv1_2) 
     print('serve_forever...')
