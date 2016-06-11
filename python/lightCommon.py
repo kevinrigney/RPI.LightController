@@ -1,6 +1,7 @@
 import socket
 import struct
 import warnings
+from multiprocessing import Process,Manager
 try:
     import RPi.GPIO as gpio
 except ImportError as e:
@@ -215,44 +216,59 @@ def sendSetMsg(node,lNum,lStat,tif=0):
 
     return success
 
+def getNodeStatus(node,outList):
+    '''
+    Given a node in the nodeList gather the status about it.
+    Primarily so we can thread out enumerateAll (it can get slow if 
+    a node can't be contacted)
+    '''
+    reqType = msg_dump
+    lightNum = 0
+    lightStatus = 0
+    tif = 0
+
+    try:        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((getIpFromName(node), port()))
+        s.sendall(struct.pack(packString,reqType,lightNum,lightStatus,tif))
+
+        recvMsg = s.recv(struct.calcsize(queryPackString))
+        reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+            
+        # Strip trailing '\x00' from socket packing
+        trail_point = lightName.find('\x00')
+        if trail_point >= 1:
+            lightName = lightName[:trail_point]
+
+        while reqType is not msg_done:
+            outList.append((node,[lightNum,lightStatus,lightName])) 
+
+            recvMsg = s.recv(struct.calcsize(queryPackString))
+            reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+            
+        s.close()
+
+    except socket.error:
+        #print "error connecting to " + str(node)
+        pass
+
 def enumerateAll():
     '''
     This function asks every node for its connected lights
     and their respective status.
     '''
-
-    nodes = []
+    # We're implementing some threading here
+    # Testing showed about a 0.5s speedup
+    manager = Manager()
+    nodes = manager.list()
+    processes=[]
 
     for node in nodeList:
+        p = Process(target=getNodeStatus, args=(node,nodes))
+        p.start()
+        processes.append(p)
 
-        reqType = msg_dump
-        lightNum = 0
-        lightStatus = 0
-        tif = 0
-
-        try:        
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((getIpFromName(node), port()))
-            s.sendall(struct.pack(packString,reqType,lightNum,lightStatus,tif))
-
-            recvMsg = s.recv(struct.calcsize(queryPackString))
-            reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
-            
-            # Strip trailing '\x00' from socket packing
-            trail_point = lightName.find('\x00')
-            if trail_point >= 1:
-                lightName = lightName[:trail_point]
-
-            while reqType is not msg_done:
-                nodes.append((node,[lightNum,lightStatus,lightName])) 
-
-                recvMsg = s.recv(struct.calcsize(queryPackString))
-                reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
-            
-            s.close()
-
-        except socket.error:
-            #print "error connecting to " + str(node)
-            pass
+    for p in processes:
+        p.join()
 
     return nodes
