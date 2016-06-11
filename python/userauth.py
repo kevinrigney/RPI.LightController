@@ -10,7 +10,7 @@ num_iterations=100000
 
 # Make sure it's outside of the repo where the server
 # can't access it
-cred_db_filename='credentials.db'
+cred_db_filename='python/credentials.db'
 
 try:
     with open(cred_db_filename,'rb') as fh:
