@@ -232,19 +232,17 @@ def getNodeStatus(node,outList):
         s.connect((getIpFromName(node), port()))
         s.sendall(struct.pack(packString,reqType,lightNum,lightStatus,tif))
 
-        recvMsg = s.recv(struct.calcsize(queryPackString))
-        reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
-            
-        # Strip trailing '\x00' from socket packing
-        trail_point = lightName.find('\x00')
-        if trail_point >= 1:
-            lightName = lightName[:trail_point]
-
         while reqType is not msg_done:
-            outList.append((node,[lightNum,lightStatus,lightName])) 
-
             recvMsg = s.recv(struct.calcsize(queryPackString))
             reqType,lightNum,lightStatus,lightName = struct.unpack(queryPackString,recvMsg)
+
+            if reqType is not msg_done:
+                trail_point = lightName.find('\x00')
+                if trail_point >= 1:
+                    lightName = lightName[:trail_point]
+ 
+                outList.append((node,[lightNum,lightStatus,lightName])) 
+
             
         s.close()
 
