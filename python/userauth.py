@@ -10,11 +10,12 @@ num_iterations=100000
 
 # Make sure it's outside of the repo where the server
 # can't access it
-cred_db_filename='python/credentials.db'
+cred_db_filename='/home/pi/credentials.db'
 
 try:
     with open(cred_db_filename,'rb') as fh:
         credentials = cPickle.load(fh)
+        print(credentials)
 except:
     if __name__ == '__main__':
         # TODO - check if there is already a credential file. Maybe we can't open
@@ -134,6 +135,18 @@ def try_rmuser(username,password):
     else:
         return False
 
+def try_auth(user,password):
+    # If the user exists
+    if user in credentials:
+        creds = credentials[user]
+        if(test_db_tuple(password,creds[DB_HASH],creds[DB_NUMITS],creds[DB_SALT],creds[DB_SALTLEN])):
+            # TODO if the num_its or the salt length aren't the most up-to-date
+            # then replace the old hash with a new one
+            # Maybe by calling try_rmuser then try_adduser
+            return True,user
+    # We get here if the password is bad or the user doesn't exist
+    return False, user
+
 
 def try_authenticate(authorization,authtype='basic'):
     # Given an authroization string check if the user exists
@@ -158,16 +171,7 @@ def try_authenticate(authorization,authtype='basic'):
         if user:
             # We've parsed the auth string. Test the password
             password=authorization[1]
-            # If the user exists
-            if user in credentials:
-                creds = credentials[user]
-                if(test_db_tuple(password,creds[DB_HASH],creds[DB_NUMITS],creds[DB_SALT],creds[DB_SALTLEN])):
-                    # TODO if the num_its or the salt length aren't the most up-to-date
-                    # then replace the old hash with a new one
-                    # Maybe by calling try_rmuser then try_adduser
-                    return True,user
-            # We get here if the password is bad or the user doesn't exist
-            return False, user
+            return try_auth(user,password)
     # We get here if the auth string was bad
     return False,None
 
