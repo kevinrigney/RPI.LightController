@@ -24,6 +24,10 @@ node_list = lc.enumerateAll()
 for node,props in node_list:
     lights.append((node,props[lc.l_num],props[lc.l_name]))
 
+# Sort the lights by name
+# See http://stackoverflow.com/a/10695161
+lights = sorted(lights, key=lambda x: x[2])
+
 # Write HTML header
 print(html.textHeader())
 # Write viewport
