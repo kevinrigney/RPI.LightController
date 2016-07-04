@@ -106,7 +106,7 @@ nodeProps = {
                         'relays':
                             [{'relay_pin':3,'relay_active':gpio.LOW},{'relay_pin':2,'relay_active':gpio.LOW}],
                         'lights':
-                            [ [3,off,'D-Bottom', [] ], [2,off,'D-Top', [] ] ]
+                            [ [3,off,'LR Fan', [] ], [2,off,'Window Fan', [] ] ]
                         },    
 
              }
