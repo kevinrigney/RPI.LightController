@@ -20,8 +20,9 @@ class momentaryHandler():
         # Oh well. There isn't much of a performance hit because of it. 
         # This is a simple application after all
     
-        # Debounce
-        sleep(0.2)
+        # Debounce JUST a little more
+        if self.debounce:
+            sleep(0.2)
     
         # This is another "debounce" of sorts. Because we are using the raspberry pi
         # as a VERY SMALL current source it may fluctuate at times. This makes sure 
@@ -51,13 +52,14 @@ class momentaryHandler():
     def read(self):        
         return gpio.input(self.switch_pin)
     
-    def __init__(self,switch_pin,switch_type,node,light_num):
+    def __init__(self,switch_pin,switch_type,node,light_num,debounce=False):
         self.switch_pin = switch_pin
         self.switch_type = switch_type  
         self.status = not self.read()
         self.node = lc.getIpFromName(node)
         self.light = light_num
         self.first_run = True
+        self.debounce = debounce
         self.callback(self.switch_pin)
         
         
@@ -68,7 +70,10 @@ class toggleHandler():
         
         # Because this is a toggle just take the value of the switch and
         # apply it to the light
-        sleep(0.2)
+        # Debounce JUST a little more
+        if self.debounce:
+            sleep(0.2)
+
         if self.read() == True:
             self.status = lc.on
         else:        
@@ -95,13 +100,14 @@ class toggleHandler():
         else:
             return False
     
-    def __init__(self,switch_dict):
+    def __init__(self,switch_dict,debounce=False):
         self.switch_pin = switch_dict['switch_pin']
         self.switch_type = switch_dict['switch_type']
         self.switch_active = switch_dict['switch_active']
         self.status = self.read()
         self.node = lc.getIpFromName(switch_dict['node_name'])
         self.light = switch_dict['node_light']
+        self.debounce=debounce
         # Now that the class is set up act on the status of the switch
         self.callback(self.switch_pin)        
 
